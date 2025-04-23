@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "747266049180",
+    "project_id": "help-student-402ab",
+    "storage_bucket": "help-student-402ab.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:747266049180:android:2228e31a536585df729959",
+        "android_client_info": {
+          "package_name": "com.just.helpstudent"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAvGmiKek_tyI-_ToIuo_ShCTHNRgczkM8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
