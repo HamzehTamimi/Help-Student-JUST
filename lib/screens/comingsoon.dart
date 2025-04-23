@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class ComingSoon extends StatelessWidget {
+  const ComingSoon({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,14 +23,16 @@ class ComingSoon extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
             TextButton(
-              onPressed: () {Navigator.pop(context);},
-              child: Text("Go to Home"),
+              onPressed: () {
+                Navigator.pop(context);
+              },
               style: TextButton.styleFrom(
                 backgroundColor: Color.fromRGBO(1, 87, 155, 1),
                 foregroundColor: Colors.white,
-                padding: EdgeInsets.all(25)
+                padding: EdgeInsets.all(25),
               ),
-            )
+              child: Text("Go to Home"),
+            ),
           ],
         ),
       ),

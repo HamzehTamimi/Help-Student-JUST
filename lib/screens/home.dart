@@ -3,6 +3,8 @@ import 'package:helpstudent/cards/cards.dart';
 import 'package:helpstudent/screens/settings.dart';
 
 class Homescreen extends StatelessWidget {
+  const Homescreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -15,8 +17,8 @@ class Homescreen extends StatelessWidget {
         },
         foregroundColor: Color.fromRGBO(187, 222, 251, 1),
         backgroundColor: Color.fromRGBO(1, 87, 155, 1),
-        child: Icon(Icons.settings),
         tooltip: "Settings",
+        child: Icon(Icons.settings),
       ),
       appBar: AppBar(
         title: const Text('Help Student'),

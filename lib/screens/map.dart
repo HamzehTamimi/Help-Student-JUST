@@ -6,6 +6,8 @@ void main() {
 }
 
 class FirstApp extends StatelessWidget {
+  const FirstApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -28,10 +30,7 @@ class Map extends StatelessWidget {
         backgroundColor: Color.fromRGBO(187, 222, 251, 1),
         title: const Text(
           "Map",
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 20,
-          ),
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
         ),
         centerTitle: true,
       ),
@@ -47,12 +46,14 @@ class Ccontainer extends StatelessWidget {
   final String mapUrl =
       "https://www.google.com/maps/d/viewer?hl=ar&mid=1hFwEahSBrdebkXl0Uy0-lojiRiY30g4&ll=32.49759881514722%2C35.98446569229725&z=15";
 
+  Ccontainer({super.key});
+
   // دالة لفتح الرابط
   Future<void> _launchURL() async {
-    final Uri _url = Uri.parse(mapUrl);
+    final Uri url = Uri.parse(mapUrl);
 
-    if (await canLaunchUrl(_url)) {
-      await launchUrl(_url);
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url);
     } else {
       throw 'Could not launch $mapUrl';
     }
@@ -65,10 +66,7 @@ class Ccontainer extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          Text(
-            "Medical Buildings",
-            style: TextStyle(fontSize: 20),
-          ),
+          Text("Medical Buildings", style: TextStyle(fontSize: 20)),
           Padding(
             padding: const EdgeInsets.all(10.0),
             child: ClipRRect(
@@ -79,34 +77,26 @@ class Ccontainer extends StatelessWidget {
                 constrained: true,
                 minScale: 1.0,
                 maxScale: 4.0,
-                child: Image.asset(
-                  "images/map1.jpg",
-                  fit: BoxFit.fill,
-                ),
+                child: Image.asset("images/map1.jpg", fit: BoxFit.fill),
               ),
             ),
           ),
           const SizedBox(height: 10), // مسافة بين الصور
-          Text(
-            "Engineering Buildings",
-            style: TextStyle(fontSize: 20),
-          ),
+          Text("Engineering Buildings", style: TextStyle(fontSize: 20)),
           Padding(
             padding: const EdgeInsets.all(10.0),
             // this is for zoom of the image
             child: ClipRRect(
               borderRadius: BorderRadius.circular(15.0),
               child: InteractiveViewer(
-                transformationController:
-                    TransformationController(Matrix4.identity()..scale(2.0)),
+                transformationController: TransformationController(
+                  Matrix4.identity()..scale(2.0),
+                ),
                 boundaryMargin: EdgeInsets.zero,
                 constrained: true,
                 minScale: 1.0,
                 maxScale: 4.0,
-                child: Image.asset(
-                  "images/map2.jpg",
-                  fit: BoxFit.fill,
-                ),
+                child: Image.asset("images/map2.jpg", fit: BoxFit.fill),
               ),
             ),
           ),

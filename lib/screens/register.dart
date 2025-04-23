@@ -1,18 +1,34 @@
-// login_page.dart
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:helpstudent/screens/home.dart';
-import 'package:helpstudent/screens/register.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
-
-  @override
-  _LoginPageState createState() => _LoginPageState();
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  runApp(const MyApp());
 }
 
-class _LoginPageState extends State<LoginPage> {
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(
+      title: 'Firebase Register',
+      debugShowCheckedModeBanner: false,
+      home: RegisterPage(),
+    );
+  }
+}
+
+class RegisterPage extends StatefulWidget {
+  const RegisterPage({super.key});
+
+  @override
+  _RegisterPageState createState() => _RegisterPageState();
+}
+
+class _RegisterPageState extends State<RegisterPage> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -26,29 +42,25 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
-  Future<void> _login() async {
+  Future<void> _register() async {
     if (_formKey.currentState!.validate()) {
       setState(() => _isLoading = true);
       try {
-        // Initialize Firebase if it hasn't been already
+        // Initialize Firebase if it hasn't been already.  This is important for web!
         if (Firebase.apps.isEmpty) {
           await Firebase.initializeApp();
         }
+
         final UserCredential userCredential = await FirebaseAuth.instance
-            .signInWithEmailAndPassword(
+            .createUserWithEmailAndPassword(
               email: _emailController.text.trim(),
               password: _passwordController.text.trim(),
             );
         if (userCredential.user != null) {
           // ignore: avoid_print
-          print('Logged in! User UID: ${userCredential.user!.uid}');
-          // Navigate to the existing home screen after successful login
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const Homescreen(),
-            ), // Use your HomeScreen here
-          );
+          print('Registered! User UID: ${userCredential.user!.uid}');
+          // You might want to send the user to a new page after successful registration
+          // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomePage()));
         }
       } on FirebaseAuthException catch (e) {
         setState(() {
@@ -83,7 +95,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Login')),
+      appBar: AppBar(title: const Text('Register')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -104,24 +116,19 @@ class _LoginPageState extends State<LoginPage> {
               ),
               const SizedBox(height: 20),
               ElevatedButton(
-                onPressed: _isLoading ? null : _login,
+                onPressed: _isLoading ? null : _register,
                 child:
                     _isLoading
                         ? const CircularProgressIndicator()
-                        : const Text('Login'),
+                        : const Text('Register'),
               ),
               if (_errorMessage.isNotEmpty)
                 Text(_errorMessage, style: const TextStyle(color: Colors.red)),
               TextButton(
                 onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const RegisterPage(),
-                    ),
-                  );
+                  Navigator.of(context).pop();
                 },
-                child: const Text('Register'),
+                child: const Text('Already have an account? Login'),
               ),
             ],
           ),
@@ -129,8 +136,4 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   }
-}
-
-class HomeScreen {
-  const HomeScreen();
 }

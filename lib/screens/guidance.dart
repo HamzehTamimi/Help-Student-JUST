@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class GuidanceScreen extends StatefulWidget {
+  const GuidanceScreen({super.key});
+
   @override
   _GuidanceScreenState createState() => _GuidanceScreenState();
 }
@@ -49,8 +51,10 @@ class _GuidanceScreenState extends State<GuidanceScreen> {
                 ),
                 SizedBox(height: 10),
                 Container(
-                  padding:
-                      EdgeInsets.symmetric(horizontal: 12.0, vertical: 5.0),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 12.0,
+                    vertical: 5.0,
+                  ),
                   decoration: BoxDecoration(
                     border: Border.all(color: Colors.grey),
                     borderRadius: BorderRadius.circular(10.0),
@@ -58,17 +62,18 @@ class _GuidanceScreenState extends State<GuidanceScreen> {
                   child: DropdownButton<String>(
                     isExpanded: true,
                     value: selectedAcademicYear,
-                    items: <String>[
-                      'First Year',
-                      'Second Year',
-                      'Third Year',
-                      'Fourth Year'
-                    ].map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    }).toList(),
+                    items:
+                        <String>[
+                          'First Year',
+                          'Second Year',
+                          'Third Year',
+                          'Fourth Year',
+                        ].map<DropdownMenuItem<String>>((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
                     onChanged: (String? newValue) {
                       setState(() {
                         selectedAcademicYear = newValue!;
@@ -78,14 +83,13 @@ class _GuidanceScreenState extends State<GuidanceScreen> {
                   ),
                 ),
                 SizedBox(height: 10),
-                Text(
-                  'Select your semester',
-                  style: TextStyle(fontSize: 12),
-                ),
+                Text('Select your semester', style: TextStyle(fontSize: 12)),
                 SizedBox(height: 10),
                 Container(
-                  padding:
-                      EdgeInsets.symmetric(horizontal: 12.0, vertical: 5.0),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 12.0,
+                    vertical: 5.0,
+                  ),
                   decoration: BoxDecoration(
                     border: Border.all(color: Colors.grey),
                     borderRadius: BorderRadius.circular(10.0),
@@ -93,15 +97,16 @@ class _GuidanceScreenState extends State<GuidanceScreen> {
                   child: DropdownButton<String>(
                     isExpanded: true,
                     value: selectedSemester,
-                    items: <String>[
-                      'First Semester',
-                      'Second Semester',
-                    ].map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    }).toList(),
+                    items:
+                        <String>[
+                          'First Semester',
+                          'Second Semester',
+                        ].map<DropdownMenuItem<String>>((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
                     onChanged: (String? newValue) {
                       setState(() {
                         selectedSemester = newValue!;
@@ -161,7 +166,7 @@ class _GuidanceScreenState extends State<GuidanceScreen> {
                   ),
                 ],
               ),
-            )
+            ),
           ],
         ),
       ),

@@ -10,7 +10,7 @@ class Card extends StatelessWidget {
   final String title;
   final Widget targetPage;
 
-  Card(this.icon, this.title, this.targetPage);
+  const Card(this.icon, this.title, this.targetPage, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -52,6 +52,8 @@ class Card extends StatelessWidget {
 }
 
 class MapCard extends StatelessWidget {
+  const MapCard({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Card(Icons.location_on, "Maps", Map());
@@ -59,6 +61,8 @@ class MapCard extends StatelessWidget {
 }
 
 class GPACard extends StatelessWidget {
+  const GPACard({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Card(Icons.calculate, "Calculate GPA", GPACalculatorApp());
@@ -66,6 +70,8 @@ class GPACard extends StatelessWidget {
 }
 
 class ITSpecialtyCard extends StatelessWidget {
+  const ITSpecialtyCard({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Card(Icons.computer, "IT Specialties", ComingSoon());
@@ -73,6 +79,8 @@ class ITSpecialtyCard extends StatelessWidget {
 }
 
 class CVCard extends StatelessWidget {
+  const CVCard({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Card(Icons.person, "CV", CV());
@@ -80,6 +88,8 @@ class CVCard extends StatelessWidget {
 }
 
 class GuidanceCard extends StatelessWidget {
+  const GuidanceCard({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Card(Icons.school, "Guidence", GuidanceScreen());
