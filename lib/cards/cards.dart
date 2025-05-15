@@ -83,7 +83,7 @@ class CVCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(Icons.person, "CV", CV());
+    return Card(Icons.person, "CV", CVFormScreen());
   }
 }
 

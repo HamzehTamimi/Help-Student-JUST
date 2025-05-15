@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:helpstudent/screens/home.dart';
 import 'firebase_options.dart';
 import 'screens/guidance.dart';
 
@@ -17,7 +18,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Student Helper',
       theme: ThemeData(primarySwatch: Colors.blue),
-      home: const GuidanceScreen(),
+      home: const Homescreen(),
       debugShowCheckedModeBanner: false,
     );
   }
