@@ -535,7 +535,7 @@ class _GuidanceScreenState extends State<GuidanceScreen> {
                                   child: ElevatedButton(
                                     onPressed: _generateStudyPlan,
                                     style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.blue,
+                                      backgroundColor: Color.fromRGBO(1, 87, 155, 1),
                                       foregroundColor: Colors.white,
                                       padding: const EdgeInsets.symmetric(vertical: 12),
                                     ),

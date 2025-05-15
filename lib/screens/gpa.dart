@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:helpstudent/screens/home.dart';
 
 void main() {
   runApp(const GPACalculatorApp());
@@ -34,6 +33,10 @@ class _GPACalculatorScreenState extends State<GPACalculatorScreen> {
   final List<String?> _selectedGrades = [null, null, null, null, null];
   String _output = '';
 
+  // Controllers for cumulative GPA input
+  final TextEditingController _cumulativeGpaController = TextEditingController();
+  final TextEditingController _totalCreditsController = TextEditingController();
+
   final Map<String, double> _gradePoints = {
     'A+': 4.2,
     'A': 4.0,
@@ -50,24 +53,45 @@ class _GPACalculatorScreenState extends State<GPACalculatorScreen> {
     'F': 0.5,
   };
 
-  void _calculateGPA() {
-    double totalPoints = 0.0;
-    double totalCredits = 0.0;
+  void _calculateGpa() {
+    double totalPointsThisSemester = 0.0;
+    double totalCreditsThisSemester = 0.0;
 
     for (int i = 0; i < 5; i++) {
       final grade = _selectedGrades[i];
-      final credits = double.tryParse(_creditControllers[i].text) ?? 0.0;
+      final creditsText = _creditControllers[i].text;
+      final credits = double.tryParse(creditsText) ?? 0.0;
 
       if (grade != null && credits > 0) {
-        totalPoints += (_gradePoints[grade]! * credits);
-        totalCredits += credits;
+        totalPointsThisSemester += (_gradePoints[grade]! * credits);
+        totalCreditsThisSemester += credits;
       }
     }
 
+    final cumulativeGpaText = _cumulativeGpaController.text;
+    final totalCreditsSoFarText = _totalCreditsController.text;
+
+    final cumulativeGpa = double.tryParse(cumulativeGpaText) ?? 0.0;
+    final totalCreditsSoFar = double.tryParse(totalCreditsSoFarText) ?? 0.0;
+
+    final totalPointsSoFar = cumulativeGpa * totalCreditsSoFar;
+    final totalPointsCombined = totalPointsThisSemester + totalPointsSoFar;
+    final totalCreditsCombined = totalCreditsThisSemester + totalCreditsSoFar;
+
     setState(() {
-      _output = totalCredits > 0
-          ? 'GPA: ${(totalPoints / totalCredits).toStringAsFixed(2)}'
-          : 'Invalid Input';
+      if (totalCreditsCombined <= 0) {
+        _output = 'Invalid Input';
+      } else {
+        final gpaThisSemester = totalCreditsThisSemester > 0
+            ? totalPointsThisSemester / totalCreditsThisSemester
+            : 0.0;
+
+        final cumulativeGPA = totalPointsCombined / totalCreditsCombined;
+
+        _output =
+            'This Semester GPA: ${gpaThisSemester.toStringAsFixed(2)}\n'
+            'New Cumulative GPA: ${cumulativeGPA.toStringAsFixed(2)}';
+      }
     });
   }
 
@@ -77,23 +101,46 @@ class _GPACalculatorScreenState extends State<GPACalculatorScreen> {
       appBar: AppBar(
         title: const Text('GPA Calculator'),
         centerTitle: true,
-        backgroundColor: const Color.fromRGBO(187, 222, 251, 1),
+        backgroundColor: Color.fromRGBO(187, 222, 251, 1),
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => Homescreen()),
-            );
-          },
-        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: TextField(
+                      controller: _cumulativeGpaController,
+                      keyboardType: TextInputType.numberWithOptions(decimal: true),
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        labelText: 'Current Cumulative GPA',
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: TextField(
+                      controller: _totalCreditsController,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        labelText: 'Total Credit Hours So Far',
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
             const HeaderRow(),
             const SizedBox(height: 10),
             Expanded(
@@ -103,7 +150,6 @@ class _GPACalculatorScreenState extends State<GPACalculatorScreen> {
                   return Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      // Grade Dropdown
                       Expanded(
                         child: Padding(
                           padding: const EdgeInsets.all(4.0),
@@ -127,7 +173,7 @@ class _GPACalculatorScreenState extends State<GPACalculatorScreen> {
                           ),
                         ),
                       ),
-                      // Credits Field
+                      const SizedBox(width: 8),
                       Expanded(
                         child: Padding(
                           padding: const EdgeInsets.all(4.0),
@@ -148,7 +194,7 @@ class _GPACalculatorScreenState extends State<GPACalculatorScreen> {
             ),
             const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: _calculateGPA,
+              onPressed: _calculateGpa,
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 15),
                 backgroundColor: const Color.fromRGBO(1, 87, 155, 1),
