@@ -65,7 +65,7 @@ class GPACard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(Icons.calculate, "Calculate GPA", GPACalculatorApp());
+    return Card(Icons.calculate, "Calculate GPA", GPACalculatorScreen());
   }
 }
 

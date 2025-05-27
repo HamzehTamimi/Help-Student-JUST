@@ -1,22 +1,13 @@
 import 'package:flutter/material.dart';
 
-void main() {
-  runApp(const GPACalculatorApp());
-}
+class Subject {
+  TextEditingController creditController;
+  String? selectedGrade;
 
-class GPACalculatorApp extends StatelessWidget {
-  const GPACalculatorApp({super.key});
+  Subject() : creditController = TextEditingController();
 
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'GPA Calculator',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: const GPACalculatorScreen(),
-    );
+  void dispose() {
+    creditController.dispose();
   }
 }
 
@@ -28,9 +19,7 @@ class GPACalculatorScreen extends StatefulWidget {
 }
 
 class _GPACalculatorScreenState extends State<GPACalculatorScreen> {
-  final List<TextEditingController> _creditControllers =
-      List.generate(5, (_) => TextEditingController());
-  final List<String?> _selectedGrades = [null, null, null, null, null];
+  List<Subject> _subjects = [Subject()]; // Start with one subject
   String _output = '';
 
   // Controllers for cumulative GPA input
@@ -53,13 +42,38 @@ class _GPACalculatorScreenState extends State<GPACalculatorScreen> {
     'F': 0.5,
   };
 
+  @override
+  void dispose() {
+    for (var subject in _subjects) {
+      subject.dispose();
+    }
+    _cumulativeGpaController.dispose();
+    _totalCreditsController.dispose();
+    super.dispose();
+  }
+
+  void _addSubject() {
+    setState(() {
+      _subjects.add(Subject());
+    });
+  }
+
+  void _removeSubject(int index) {
+    if (_subjects.length > 1) {
+      setState(() {
+        _subjects[index].dispose();
+        _subjects.removeAt(index);
+      });
+    }
+  }
+
   void _calculateGpa() {
     double totalPointsThisSemester = 0.0;
     double totalCreditsThisSemester = 0.0;
 
-    for (int i = 0; i < 5; i++) {
-      final grade = _selectedGrades[i];
-      final creditsText = _creditControllers[i].text;
+    for (var subject in _subjects) {
+      final grade = subject.selectedGrade;
+      final creditsText = subject.creditController.text;
       final credits = double.tryParse(creditsText) ?? 0.0;
 
       if (grade != null && credits > 0) {
@@ -140,54 +154,96 @@ class _GPACalculatorScreenState extends State<GPACalculatorScreen> {
                 ),
               ],
             ),
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'Subjects',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                Row(
+                  children: [
+                    IconButton(
+                      onPressed: _addSubject,
+                      icon: const Icon(Icons.add_circle, color: Colors.green),
+                      tooltip: 'Add Subject',
+                    ),
+                    Text('${_subjects.length} subjects'),
+                  ],
+                ),
+              ],
+            ),
             const SizedBox(height: 10),
             const HeaderRow(),
             const SizedBox(height: 10),
             Expanded(
               child: ListView.builder(
-                itemCount: 5,
+                itemCount: _subjects.length,
                 itemBuilder: (context, index) {
-                  return Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.all(4.0),
-                          child: DropdownButtonFormField<String>(
-                            value: _selectedGrades[index],
-                            items: _gradePoints.keys
-                                .map((grade) => DropdownMenuItem(
-                                      value: grade,
-                                      child: Text(grade),
-                                    ))
-                                .toList(),
-                            onChanged: (value) {
-                              setState(() {
-                                _selectedGrades[index] = value;
-                              });
-                            },
-                            decoration: const InputDecoration(
-                              border: OutlineInputBorder(),
-                              labelText: 'Grade',
+                  return Card(
+                    margin: const EdgeInsets.symmetric(vertical: 4),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            flex: 2,
+                            child: DropdownButtonFormField<String>(
+                              value: _subjects[index].selectedGrade,
+                              items: _gradePoints.keys
+                                  .map((grade) => DropdownMenuItem(
+                                        value: grade,
+                                        child: Text(grade),
+                                      ))
+                                  .toList(),
+                              onChanged: (value) {
+                                setState(() {
+                                  _subjects[index].selectedGrade = value;
+                                });
+                              },
+                              decoration: const InputDecoration(
+                                border: OutlineInputBorder(),
+                                labelText: 'Grade',
+                                contentPadding: EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 8,
+                                ),
+                              ),
                             ),
                           ),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.all(4.0),
-                          child: TextField(
-                            controller: _creditControllers[index],
-                            keyboardType: TextInputType.number,
-                            decoration: const InputDecoration(
-                              border: OutlineInputBorder(),
-                              labelText: 'Credits',
+                          const SizedBox(width: 8),
+                          Expanded(
+                            flex: 2,
+                            child: TextField(
+                              controller: _subjects[index].creditController,
+                              keyboardType: TextInputType.number,
+                              decoration: const InputDecoration(
+                                border: OutlineInputBorder(),
+                                labelText: 'Credits',
+                                contentPadding: EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 8,
+                                ),
+                              ),
                             ),
                           ),
-                        ),
+                          const SizedBox(width: 8),
+                          IconButton(
+                            onPressed: _subjects.length > 1
+                                ? () => _removeSubject(index)
+                                : null,
+                            icon: Icon(
+                              Icons.remove_circle,
+                              color: _subjects.length > 1
+                                  ? Colors.red
+                                  : Colors.grey,
+                            ),
+                            tooltip: 'Remove Subject',
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   );
                 },
               ),
@@ -217,22 +273,25 @@ class HeaderRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: const [
         Expanded(
+          flex: 2,
           child: Text(
             'Grade',
             textAlign: TextAlign.center,
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
         ),
+        SizedBox(width: 8),
         Expanded(
+          flex: 2,
           child: Text(
             'Credits / Hours',
             textAlign: TextAlign.center,
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
         ),
+        SizedBox(width: 48), // Space for remove button
       ],
     );
   }
@@ -246,14 +305,17 @@ class OutputField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+      padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 15),
       decoration: BoxDecoration(
         border: Border.all(color: Colors.grey),
         borderRadius: BorderRadius.circular(10),
       ),
       child: Text(
-        output,
-        style: const TextStyle(fontSize: 16),
+        output.isEmpty ? 'Enter grades and credits, then tap Calculate' : output,
+        style: TextStyle(
+          fontSize: 16,
+          color: output.isEmpty ? Colors.grey[600] : Colors.black,
+        ),
       ),
     );
   }
