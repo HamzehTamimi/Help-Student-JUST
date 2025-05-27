@@ -13,9 +13,7 @@ class GPACalculatorApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'GPA Calculator',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
+      theme: ThemeData(primarySwatch: Colors.blue),
       home: const GPACalculatorScreen(),
     );
   }
@@ -29,8 +27,10 @@ class GPACalculatorScreen extends StatefulWidget {
 }
 
 class _GPACalculatorScreenState extends State<GPACalculatorScreen> {
-  final List<TextEditingController> _creditControllers =
-      List.generate(5, (_) => TextEditingController());
+  final List<TextEditingController> _creditControllers = List.generate(
+    5,
+    (_) => TextEditingController(),
+  );
   final List<String?> _selectedGrades = [null, null, null, null, null];
   String _output = '';
 
@@ -65,9 +65,10 @@ class _GPACalculatorScreenState extends State<GPACalculatorScreen> {
     }
 
     setState(() {
-      _output = totalCredits > 0
-          ? 'GPA: ${(totalPoints / totalCredits).toStringAsFixed(2)}'
-          : 'Invalid Input';
+      _output =
+          totalCredits > 0
+              ? 'GPA: ${(totalPoints / totalCredits).toStringAsFixed(2)}'
+              : 'Invalid Input';
     });
   }
 
@@ -109,12 +110,15 @@ class _GPACalculatorScreenState extends State<GPACalculatorScreen> {
                           padding: const EdgeInsets.all(4.0),
                           child: DropdownButtonFormField<String>(
                             value: _selectedGrades[index],
-                            items: _gradePoints.keys
-                                .map((grade) => DropdownMenuItem(
-                                      value: grade,
-                                      child: Text(grade),
-                                    ))
-                                .toList(),
+                            items:
+                                _gradePoints.keys
+                                    .map(
+                                      (grade) => DropdownMenuItem(
+                                        value: grade,
+                                        child: Text(grade),
+                                      ),
+                                    )
+                                    .toList(),
                             onChanged: (value) {
                               setState(() {
                                 _selectedGrades[index] = value;
@@ -205,10 +209,7 @@ class OutputField extends StatelessWidget {
         border: Border.all(color: Colors.grey),
         borderRadius: BorderRadius.circular(10),
       ),
-      child: Text(
-        output,
-        style: const TextStyle(fontSize: 16),
-      ),
+      child: Text(output, style: const TextStyle(fontSize: 16)),
     );
   }
 }

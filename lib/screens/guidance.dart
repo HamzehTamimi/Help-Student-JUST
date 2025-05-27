@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 
 class GuidanceScreen extends StatefulWidget {
-  const GuidanceScreen({Key? key}) : super(key: key);
+  const GuidanceScreen({super.key});
 
   @override
   State<GuidanceScreen> createState() => _GuidanceScreenState();
@@ -200,9 +200,10 @@ class _GuidanceScreenState extends State<GuidanceScreen> {
           );
           // Simple check - in a real app, you'd verify if prerequisites are completed
           if (prerequisites.any((prereq) => prereq.contains('Completion'))) {
-            if (yearValue < 3)
+            if (yearValue < 3) {
               isEligible =
                   false; // Require at least 3rd year for courses with completion prerequisites
+            }
           }
         }
 
