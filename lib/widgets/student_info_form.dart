@@ -24,9 +24,6 @@ class _StudentInfoFormState extends State<StudentInfoForm> {
   final List<String> _specialties = [
     'Computer Information Systems',
     'Computer Science',
-    'Software Engineering',
-    'Data Science',
-    'Cybersecurity',
   ];
 
   final List<String> _years = [
