@@ -64,3 +64,48 @@ class CustomCard extends StatelessWidget {
     );
   }
 }
+
+class MapCard extends StatelessWidget {
+  const MapCard({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(Icons.location_on, "Maps", Map());
+  }
+}
+
+class GPACard extends StatelessWidget {
+  const GPACard({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(Icons.calculate, "Calculate GPA", GPACalculatorApp());
+  }
+}
+
+class ITSpecialtyCard extends StatelessWidget {
+  const ITSpecialtyCard({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(Icons.computer, "IT Specialties", ComingSoon());
+  }
+}
+
+class CVCard extends StatelessWidget {
+  const CVCard({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(Icons.person, "CV", CV());
+  }
+}
+
+class GuidanceCard extends StatelessWidget {
+  const GuidanceCard({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(Icons.school, "Guidence", GuidanceScreen());
+  }
+}

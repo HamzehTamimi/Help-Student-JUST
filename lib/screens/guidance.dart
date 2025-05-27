@@ -12,7 +12,7 @@ class _GuidanceScreenState extends State<GuidanceScreen> {
   final TextEditingController _gpaController = TextEditingController();
   String selectedAcademicYear = 'First Year';
   String selectedSemester = 'First Semester';
-  String selectedSpecialty = 'Computer Information Systems'; // Added specialty
+  String selectedSpecialty = 'Computer Information Systems'; 
   String? selectedGPA;
   bool isLoading = true;
   bool isGeneratingPlan = false;
@@ -513,26 +513,38 @@ class _GuidanceScreenState extends State<GuidanceScreen> {
                             ),
                             const SizedBox(height: 20),
 
-                            // Action buttons
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            // Action buttons - UPDATED FOR BETTER FITTING
+                            Column(
                               children: [
-                                ElevatedButton(
-                                  onPressed: _showIncompleteCoursesDialog,
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.blue[100],
-                                  ),
-                                  child: const Text(
-                                    'Select Incomplete Courses',
+                                SizedBox(
+                                  width: double.infinity,
+                                  child: ElevatedButton(
+                                    onPressed: _showIncompleteCoursesDialog,
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.blue[100],
+                                      padding: const EdgeInsets.symmetric(vertical: 12),
+                                    ),
+                                    child: const Text(
+                                      'Select Incomplete Courses',
+                                      style: TextStyle(fontSize: 14),
+                                    ),
                                   ),
                                 ),
-                                ElevatedButton(
-                                  onPressed: _generateStudyPlan,
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.blue,
-                                    foregroundColor: Colors.white,
+                                const SizedBox(height: 10),
+                                SizedBox(
+                                  width: double.infinity,
+                                  child: ElevatedButton(
+                                    onPressed: _generateStudyPlan,
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Color.fromRGBO(1, 87, 155, 1),
+                                      foregroundColor: Colors.white,
+                                      padding: const EdgeInsets.symmetric(vertical: 12),
+                                    ),
+                                    child: const Text(
+                                      'Generate Study Plan',
+                                      style: TextStyle(fontSize: 14),
+                                    ),
                                   ),
-                                  child: const Text('Generate Study Plan'),
                                 ),
                               ],
                             ),
