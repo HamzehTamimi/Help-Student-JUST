@@ -19,7 +19,11 @@ class Course {
     this.isElective = false,
   });
 
-  factory Course.fromMap(String code, Map<String, dynamic> data, String department) {
+  factory Course.fromMap(
+    String code,
+    Map<String, dynamic> data,
+    String department,
+  ) {
     return Course(
       code: code,
       name: data['name'] ?? '',
@@ -39,18 +43,22 @@ class Course {
   }
 
   bool hasPrerequisites() => prerequisites.isNotEmpty;
-  
+
   bool isAvailableForYear(int currentYear) => year <= currentYear;
-  
+
   bool isAvailableForSemester(int currentYear, int currentSemester) {
-    if (semester == "Summer") return true; // Summer courses can be taken anytime
+    if (semester == "Summer") {
+      return true; // Summer courses can be taken anytime
+    }
     if (year < currentYear) return true;
-    if (year == currentYear && (semester as int) <= currentSemester) return true;
+    if (year == currentYear && (semester as int) <= currentSemester) {
+      return true;
+    }
     return false;
   }
 
   bool isSummerCourse() => semester == "Summer";
-  
+
   int getSemesterNumber() {
     if (semester == "Summer") return 3;
     return semester as int;
@@ -58,6 +66,6 @@ class Course {
 
   String getSemesterDisplay() {
     if (semester == "Summer") return "Summer";
-    return "Semester ${semester}";
+    return "Semester $semester";
   }
 }

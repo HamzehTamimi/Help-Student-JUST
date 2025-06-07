@@ -6,10 +6,10 @@ class StudentInfoForm extends StatefulWidget {
   final StudentProfile? initialProfile;
 
   const StudentInfoForm({
-    Key? key,
+    super.key,
     required this.onProfileChanged,
     this.initialProfile,
-  }) : super(key: key);
+  });
 
   @override
   State<StudentInfoForm> createState() => _StudentInfoFormState();
@@ -28,15 +28,12 @@ class _StudentInfoFormState extends State<StudentInfoForm> {
 
   final List<String> _years = [
     'First Year',
-    'Second Year', 
+    'Second Year',
     'Third Year',
     'Fourth Year',
   ];
 
-  final List<String> _semesters = [
-    'First Semester',
-    'Second Semester',
-  ];
+  final List<String> _semesters = ['First Semester', 'Second Semester'];
 
   @override
   void initState() {
@@ -45,7 +42,9 @@ class _StudentInfoFormState extends State<StudentInfoForm> {
       _gpaController.text = widget.initialProfile!.gpa.toString();
       _selectedSpecialty = widget.initialProfile!.specialty;
       _selectedYear = _getYearString(widget.initialProfile!.currentYear);
-      _selectedSemester = _getSemesterString(widget.initialProfile!.currentSemester);
+      _selectedSemester = _getSemesterString(
+        widget.initialProfile!.currentSemester,
+      );
     }
   }
 
@@ -57,11 +56,16 @@ class _StudentInfoFormState extends State<StudentInfoForm> {
 
   String _getYearString(int year) {
     switch (year) {
-      case 1: return 'First Year';
-      case 2: return 'Second Year';
-      case 3: return 'Third Year';
-      case 4: return 'Fourth Year';
-      default: return 'First Year';
+      case 1:
+        return 'First Year';
+      case 2:
+        return 'Second Year';
+      case 3:
+        return 'Third Year';
+      case 4:
+        return 'Fourth Year';
+      default:
+        return 'First Year';
     }
   }
 
@@ -71,11 +75,16 @@ class _StudentInfoFormState extends State<StudentInfoForm> {
 
   int _getYearValue(String year) {
     switch (year) {
-      case 'First Year': return 1;
-      case 'Second Year': return 2;
-      case 'Third Year': return 3;
-      case 'Fourth Year': return 4;
-      default: return 1;
+      case 'First Year':
+        return 1;
+      case 'Second Year':
+        return 2;
+      case 'Third Year':
+        return 3;
+      case 'Fourth Year':
+        return 4;
+      default:
+        return 1;
     }
   }
 
@@ -108,9 +117,9 @@ class _StudentInfoFormState extends State<StudentInfoForm> {
   }
 
   void _showError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
@@ -133,16 +142,18 @@ class _StudentInfoFormState extends State<StudentInfoForm> {
               },
             ),
             const SizedBox(height: 16),
-            
+
             _buildTextField(
               label: 'Enter your last semester GPA',
               controller: _gpaController,
               hintText: 'e.g. 3.5',
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
               onChanged: (_) => _updateProfile(),
             ),
             const SizedBox(height: 16),
-            
+
             _buildDropdown(
               label: 'Select your academic year',
               value: _selectedYear,
@@ -155,7 +166,7 @@ class _StudentInfoFormState extends State<StudentInfoForm> {
               },
             ),
             const SizedBox(height: 16),
-            
+
             _buildDropdown(
               label: 'Select your semester',
               value: _selectedSemester,
@@ -193,10 +204,13 @@ class _StudentInfoFormState extends State<StudentInfoForm> {
           child: DropdownButton<String>(
             isExpanded: true,
             value: value,
-            items: items.map((item) => DropdownMenuItem(
-              value: item,
-              child: Text(item),
-            )).toList(),
+            items:
+                items
+                    .map(
+                      (item) =>
+                          DropdownMenuItem(value: item, child: Text(item)),
+                    )
+                    .toList(),
             onChanged: onChanged,
             underline: Container(),
           ),

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:helpstudent/screens/home.dart';
+import 'package:helpstudent/screens/login.dart';
 import 'firebase_options.dart';
-import 'screens/guidance.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Student Helper',
       theme: ThemeData(primarySwatch: Colors.blue),
-      home: const Homescreen(),
+      home: const LoginPage(),
       debugShowCheckedModeBanner: false,
     );
   }

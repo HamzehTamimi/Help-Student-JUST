@@ -7,11 +7,11 @@ class CourseSelectionDialog extends StatefulWidget {
   final String title;
 
   const CourseSelectionDialog({
-    Key? key,
+    super.key,
     required this.availableCourses,
     required this.selectedCourses,
     required this.title,
-  }) : super(key: key);
+  });
 
   @override
   State<CourseSelectionDialog> createState() => _CourseSelectionDialogState();
@@ -29,10 +29,10 @@ class _CourseSelectionDialogState extends State<CourseSelectionDialog> {
 
   List<Course> get _filteredCourses {
     if (_searchQuery.isEmpty) return widget.availableCourses;
-    
+
     return widget.availableCourses.where((course) {
       return course.code.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-             course.name.toLowerCase().contains(_searchQuery.toLowerCase());
+          course.name.toLowerCase().contains(_searchQuery.toLowerCase());
     }).toList();
   }
 
@@ -59,7 +59,7 @@ class _CourseSelectionDialogState extends State<CourseSelectionDialog> {
               },
             ),
             const SizedBox(height: 16),
-            
+
             // Course list
             Expanded(
               child: ListView.builder(
@@ -72,7 +72,9 @@ class _CourseSelectionDialogState extends State<CourseSelectionDialog> {
                       subtitle: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Year ${course.year}, Semester ${course.semester}'),
+                          Text(
+                            'Year ${course.year}, Semester ${course.semester}',
+                          ),
                           Text('${course.credits} Credit Hours'),
                           if (course.prerequisites.isNotEmpty)
                             Text(

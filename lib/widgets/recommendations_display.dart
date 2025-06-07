@@ -11,12 +11,12 @@ class RecommendationsDisplay extends StatelessWidget {
   final bool isLoading;
 
   const RecommendationsDisplay({
-    Key? key,
+    super.key,
     required this.recommendedCourses,
     required this.profile,
     required this.allCourses,
     required this.isLoading,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -33,22 +33,26 @@ class RecommendationsDisplay extends StatelessWidget {
       );
     }
 
-    final summary = profile != null 
-        ? RecommendationService.generateRecommendationSummary(
-            recommendedCourses, profile!, allCourses)
-        : null;
+    final summary =
+        profile != null
+            ? RecommendationService.generateRecommendationSummary(
+              recommendedCourses,
+              profile!,
+              allCourses,
+            )
+            : null;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Summary Card
         if (summary != null) _buildSummaryCard(summary),
-        
+
         const SizedBox(height: 8),
-        
+
         // Course List Header
         _buildCourseListHeader(),
-        
+
         // Course List
         Expanded(
           child: ListView.builder(
@@ -65,7 +69,7 @@ class RecommendationsDisplay extends StatelessWidget {
 
   Widget _buildSummaryCard(Map<String, dynamic> summary) {
     final isHeavyLoad = summary['totalCourses'] >= 7;
-  
+
     return Card(
       color: isHeavyLoad ? Colors.orange[50] : Colors.blue[50],
       child: Padding(
@@ -108,9 +112,11 @@ class RecommendationsDisplay extends StatelessWidget {
               children: [
                 _buildSummaryItem('Courses', '${summary['totalCourses']}'),
                 _buildSummaryItem('Credits', '${summary['totalCredits']}'),
-                _buildSummaryItem('Core', '${summary['coreCoursesCount']}'),
                 if (summary['incompleteCoursesCount'] > 0)
-                  _buildSummaryItem('Retakes', '${summary['incompleteCoursesCount']}'),
+                  _buildSummaryItem(
+                    'Retakes',
+                    '${summary['incompleteCoursesCount']}',
+                  ),
               ],
             ),
           ],
@@ -124,15 +130,9 @@ class RecommendationsDisplay extends StatelessWidget {
       children: [
         Text(
           value,
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
-          ),
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
         ),
-        Text(
-          label,
-          style: const TextStyle(fontSize: 12),
-        ),
+        Text(label, style: const TextStyle(fontSize: 12)),
       ],
     );
   }
@@ -153,20 +153,48 @@ class RecommendationsDisplay extends StatelessWidget {
       ),
       child: const Row(
         children: [
-          Expanded(flex: 2, child: Text('Code', style: TextStyle(fontWeight: FontWeight.bold))),
-          Expanded(flex: 4, child: Text('Course Name', style: TextStyle(fontWeight: FontWeight.bold))),
-          Expanded(flex: 1, child: Text('Credits', style: TextStyle(fontWeight: FontWeight.bold))),
-          Expanded(flex: 2, child: Text('Period', style: TextStyle(fontWeight: FontWeight.bold))),
+          Expanded(
+            flex: 2,
+            child: Text('Code', style: TextStyle(fontWeight: FontWeight.bold)),
+          ),
+          Expanded(
+            flex: 4,
+            child: Text(
+              'Course Name',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+          ),
+          Expanded(
+            flex: 1,
+            child: Text(
+              'Credits',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+          ),
+          Expanded(
+            flex: 2,
+            child: Text(
+              'Period',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+          ),
         ],
       ),
     );
   }
 
   Widget _buildCourseCard(Course course, BuildContext context) {
-    final isIncomplete = profile?.incompleteCourses.contains(course.code) ?? false;
-    final isGradRequirement = ['CIS391', 'CIS491', 'CIS492', 'CS391', 'CS491', 'CS492']
-        .contains(course.code);
-    
+    final isIncomplete =
+        profile?.incompleteCourses.contains(course.code) ?? false;
+    final isGradRequirement = [
+      'CIS391',
+      'CIS491',
+      'CIS492',
+      'CS391',
+      'CS491',
+      'CS492',
+    ].contains(course.code);
+
     return Card(
       margin: const EdgeInsets.only(bottom: 4),
       color: _getCourseCardColor(course, isIncomplete, isGradRequirement),
@@ -233,7 +261,8 @@ class RecommendationsDisplay extends StatelessWidget {
                 Row(
                   children: [
                     if (isIncomplete) _buildTag('RETAKE', Colors.orange),
-                    if (isGradRequirement) _buildTag('GRADUATION', Colors.purple),
+                    if (isGradRequirement)
+                      _buildTag('GRADUATION', Colors.purple),
                     if (course.isElective) _buildTag('ELECTIVE', Colors.blue),
                   ],
                 ),
@@ -245,7 +274,11 @@ class RecommendationsDisplay extends StatelessWidget {
     );
   }
 
-  Color? _getCourseCardColor(Course course, bool isIncomplete, bool isGradRequirement) {
+  Color? _getCourseCardColor(
+    Course course,
+    bool isIncomplete,
+    bool isGradRequirement,
+  ) {
     if (isIncomplete) return Colors.orange[50];
     if (isGradRequirement) return Colors.purple[50];
     if (course.isElective) return Colors.blue[50];
@@ -273,52 +306,66 @@ class RecommendationsDisplay extends StatelessWidget {
   }
 
   void _showCourseDetails(BuildContext context, Course course) {
-    final missingPrereqs = profile != null 
-        ? PrerequisiteChecker.getMissingPrerequisites(course, profile!, allCourses)
-        : <String>[];
+    final missingPrereqs =
+        profile != null
+            ? PrerequisiteChecker.getMissingPrerequisites(
+              course,
+              profile!,
+              allCourses,
+            )
+            : <String>[];
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(course.code),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              course.name,
-              style: const TextStyle(fontWeight: FontWeight.bold),
+      builder:
+          (context) => AlertDialog(
+            title: Text(course.code),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  course.name,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8),
+                Text('Credits: ${course.credits}'),
+                Text('Year: ${course.year}'),
+                Text('Semester: ${course.getSemesterDisplay()}'),
+                Text('Department: ${course.department.toUpperCase()}'),
+                if (course.hasPrerequisites()) ...[
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Prerequisites:',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  ...course.prerequisites.map((prereq) => Text('• $prereq')),
+                ],
+                if (missingPrereqs.isNotEmpty) ...[
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Missing Prerequisites:',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.red,
+                    ),
+                  ),
+                  ...missingPrereqs.map(
+                    (prereq) => Text(
+                      '• $prereq',
+                      style: const TextStyle(color: Colors.red),
+                    ),
+                  ),
+                ],
+              ],
             ),
-            const SizedBox(height: 8),
-            Text('Credits: ${course.credits}'),
-            Text('Year: ${course.year}'),
-            Text('Semester: ${course.getSemesterDisplay()}'),
-            Text('Department: ${course.department.toUpperCase()}'),
-            if (course.hasPrerequisites()) ...[
-              const SizedBox(height: 8),
-              const Text('Prerequisites:', style: TextStyle(fontWeight: FontWeight.bold)),
-              ...course.prerequisites.map((prereq) => Text('• $prereq')),
-            ],
-            if (missingPrereqs.isNotEmpty) ...[
-              const SizedBox(height: 8),
-              const Text(
-                'Missing Prerequisites:',
-                style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Close'),
               ),
-              ...missingPrereqs.map((prereq) => Text(
-                '• $prereq',
-                style: const TextStyle(color: Colors.red),
-              )),
             ],
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
           ),
-        ],
-      ),
     );
   }
 }

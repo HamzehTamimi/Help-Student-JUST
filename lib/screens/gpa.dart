@@ -19,11 +19,12 @@ class GPACalculatorScreen extends StatefulWidget {
 }
 
 class _GPACalculatorScreenState extends State<GPACalculatorScreen> {
-  List<Subject> _subjects = [Subject()]; // Start with one subject
+  final List<Subject> _subjects = [Subject()]; // Start with one subject
   String _output = '';
 
   // Controllers for cumulative GPA input
-  final TextEditingController _cumulativeGpaController = TextEditingController();
+  final TextEditingController _cumulativeGpaController =
+      TextEditingController();
   final TextEditingController _totalCreditsController = TextEditingController();
 
   final Map<String, double> _gradePoints = {
@@ -96,9 +97,10 @@ class _GPACalculatorScreenState extends State<GPACalculatorScreen> {
       if (totalCreditsCombined <= 0) {
         _output = 'Invalid Input';
       } else {
-        final gpaThisSemester = totalCreditsThisSemester > 0
-            ? totalPointsThisSemester / totalCreditsThisSemester
-            : 0.0;
+        final gpaThisSemester =
+            totalCreditsThisSemester > 0
+                ? totalPointsThisSemester / totalCreditsThisSemester
+                : 0.0;
 
         final cumulativeGPA = totalPointsCombined / totalCreditsCombined;
 
@@ -130,7 +132,9 @@ class _GPACalculatorScreenState extends State<GPACalculatorScreen> {
                     padding: const EdgeInsets.all(4.0),
                     child: TextField(
                       controller: _cumulativeGpaController,
-                      keyboardType: TextInputType.numberWithOptions(decimal: true),
+                      keyboardType: TextInputType.numberWithOptions(
+                        decimal: true,
+                      ),
                       decoration: const InputDecoration(
                         border: OutlineInputBorder(),
                         labelText: 'Current Cumulative GPA',
@@ -191,12 +195,15 @@ class _GPACalculatorScreenState extends State<GPACalculatorScreen> {
                             flex: 2,
                             child: DropdownButtonFormField<String>(
                               value: _subjects[index].selectedGrade,
-                              items: _gradePoints.keys
-                                  .map((grade) => DropdownMenuItem(
-                                        value: grade,
-                                        child: Text(grade),
-                                      ))
-                                  .toList(),
+                              items:
+                                  _gradePoints.keys
+                                      .map(
+                                        (grade) => DropdownMenuItem(
+                                          value: grade,
+                                          child: Text(grade),
+                                        ),
+                                      )
+                                      .toList(),
                               onChanged: (value) {
                                 setState(() {
                                   _subjects[index].selectedGrade = value;
@@ -230,14 +237,16 @@ class _GPACalculatorScreenState extends State<GPACalculatorScreen> {
                           ),
                           const SizedBox(width: 8),
                           IconButton(
-                            onPressed: _subjects.length > 1
-                                ? () => _removeSubject(index)
-                                : null,
+                            onPressed:
+                                _subjects.length > 1
+                                    ? () => _removeSubject(index)
+                                    : null,
                             icon: Icon(
                               Icons.remove_circle,
-                              color: _subjects.length > 1
-                                  ? Colors.red
-                                  : Colors.grey,
+                              color:
+                                  _subjects.length > 1
+                                      ? Colors.red
+                                      : Colors.grey,
                             ),
                             tooltip: 'Remove Subject',
                           ),
@@ -311,7 +320,9 @@ class OutputField extends StatelessWidget {
         borderRadius: BorderRadius.circular(10),
       ),
       child: Text(
-        output.isEmpty ? 'Enter grades and credits, then tap Calculate' : output,
+        output.isEmpty
+            ? 'Enter grades and credits, then tap Calculate'
+            : output,
         style: TextStyle(
           fontSize: 16,
           color: output.isEmpty ? Colors.grey[600] : Colors.black,

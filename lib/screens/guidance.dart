@@ -8,7 +8,7 @@ import '../widgets/course_selection_dialog.dart';
 import '../widgets/recommendations_display.dart';
 
 class GuidanceScreen extends StatefulWidget {
-  const GuidanceScreen({Key? key}) : super(key: key);
+  const GuidanceScreen({super.key});
 
   @override
   State<GuidanceScreen> createState() => _GuidanceScreenState();
@@ -16,13 +16,13 @@ class GuidanceScreen extends StatefulWidget {
 
 class _GuidanceScreenState extends State<GuidanceScreen> {
   final FirebaseService _firebaseService = FirebaseService();
-  
+
   StudentProfile? _currentProfile;
   Map<String, List<Course>> _departmentCourses = {};
   List<String> _completedCourses = [];
   List<String> _incompleteCourses = [];
   List<Course> _recommendedCourses = [];
-  
+
   bool _isLoadingData = true;
   bool _isGeneratingPlan = false;
 
@@ -82,18 +82,21 @@ class _GuidanceScreenState extends State<GuidanceScreen> {
 
     final result = await showDialog<List<String>>(
       context: context,
-      builder: (context) => CourseSelectionDialog(
-        availableCourses: availableCourses,
-        selectedCourses: _completedCourses,
-        title: 'Select Completed Courses',
-      ),
+      builder:
+          (context) => CourseSelectionDialog(
+            availableCourses: availableCourses,
+            selectedCourses: _completedCourses,
+            title: 'Select Completed Courses',
+          ),
     );
 
     if (result != null) {
       setState(() {
         _completedCourses = result;
         // Remove completed courses from incomplete list
-        _incompleteCourses.removeWhere((course) => _completedCourses.contains(course));
+        _incompleteCourses.removeWhere(
+          (course) => _completedCourses.contains(course),
+        );
         // Clear recommendations to force regeneration
         _recommendedCourses = [];
       });
@@ -106,9 +109,10 @@ class _GuidanceScreenState extends State<GuidanceScreen> {
       return;
     }
 
-    final availableCourses = _getCoursesForCurrentSpecialty()
-        .where((course) => !_completedCourses.contains(course.code))
-        .toList();
+    final availableCourses =
+        _getCoursesForCurrentSpecialty()
+            .where((course) => !_completedCourses.contains(course.code))
+            .toList();
 
     if (availableCourses.isEmpty) {
       _showError('No incomplete courses available');
@@ -117,11 +121,12 @@ class _GuidanceScreenState extends State<GuidanceScreen> {
 
     final result = await showDialog<List<String>>(
       context: context,
-      builder: (context) => CourseSelectionDialog(
-        availableCourses: availableCourses,
-        selectedCourses: _incompleteCourses,
-        title: 'Select Incomplete/Failed Courses',
-      ),
+      builder:
+          (context) => CourseSelectionDialog(
+            availableCourses: availableCourses,
+            selectedCourses: _incompleteCourses,
+            title: 'Select Incomplete/Failed Courses',
+          ),
     );
 
     if (result != null) {
@@ -135,20 +140,21 @@ class _GuidanceScreenState extends State<GuidanceScreen> {
 
   List<Course> _getCoursesForCurrentSpecialty() {
     if (_currentProfile == null) return [];
-    
+
     final departmentKey = _specialtyToDepartment[_currentProfile!.specialty];
-    if (departmentKey == null || !_departmentCourses.containsKey(departmentKey)) {
+    if (departmentKey == null ||
+        !_departmentCourses.containsKey(departmentKey)) {
       return [];
     }
-    
+
     return _departmentCourses[departmentKey]!;
   }
 
   List<Course> _getAllCourses() {
     final allCourses = <Course>[];
-    _departmentCourses.values.forEach((courses) {
+    for (var courses in _departmentCourses.values) {
       allCourses.addAll(courses);
-    });
+    }
     return allCourses;
   }
 
@@ -164,7 +170,8 @@ class _GuidanceScreenState extends State<GuidanceScreen> {
 
     try {
       final availableCourses = _getCoursesForCurrentSpecialty();
-      final allCourses = _getAllCourses(); // Not strictly needed for recommendation, but good for display
+      final allCourses =
+          _getAllCourses(); // Not strictly needed for recommendation, but good for display
 
       if (availableCourses.isEmpty) {
         throw Exception("No courses available for selected specialty");
@@ -175,14 +182,16 @@ class _GuidanceScreenState extends State<GuidanceScreen> {
       for (final courseCode in _completedCourses) {
         final course = availableCourses.firstWhere(
           (c) => c.code == courseCode,
-          orElse: () => Course( // Provide a default or handle unknown course codes
-            code: courseCode,
-            name: "Unknown",
-            year: 1,
-            semester: 1,
-            credits: 3, // Default to 3 credits if course not found
-            department: "unknown",
-          ),
+          orElse:
+              () => Course(
+                // Provide a default or handle unknown course codes
+                code: courseCode,
+                name: "Unknown",
+                year: 1,
+                semester: 1,
+                credits: 3, // Default to 3 credits if course not found
+                department: "unknown",
+              ),
         );
         completedCredits += course.credits;
       }
@@ -205,10 +214,17 @@ class _GuidanceScreenState extends State<GuidanceScreen> {
       });
 
       if (recommendations.isEmpty) {
-        _showInfo('No courses to recommend based on your current profile. You may have completed all available courses or need to check prerequisites.');
+        _showInfo(
+          'No courses to recommend based on your current profile. You may have completed all available courses or need to check prerequisites.',
+        );
       } else {
-        final totalCredits = recommendations.fold<int>(0, (sum, course) => sum + course.credits);
-        _showInfo('Generated plan with ${recommendations.length} courses (${totalCredits} credits)');
+        final totalCredits = recommendations.fold<int>(
+          0,
+          (sum, course) => sum + course.credits,
+        );
+        _showInfo(
+          'Generated plan with ${recommendations.length} courses ($totalCredits credits)',
+        );
       }
     } catch (e) {
       _showError('Error generating study plan: $e');
@@ -249,61 +265,68 @@ class _GuidanceScreenState extends State<GuidanceScreen> {
             IconButton(
               icon: const Icon(Icons.info_outline),
               onPressed: () => _showDataInfo(),
-              tooltip: 'View loaded course data info', // Add tooltip for better UX
+              tooltip:
+                  'View loaded course data info', // Add tooltip for better UX
             ),
         ],
       ),
-      body: _isLoadingData
-          ? const Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  CircularProgressIndicator(),
-                  SizedBox(height: 16),
-                  Text('Loading course data...'),
-                ],
-              ),
-            )
-          : Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0), // Reduced overall padding
-              child: Column(
-                children: [
-                  // Student Information Form and related sections
-                  Expanded(
-                    flex: 1, // Now takes half the space
-                    child: ListView( 
-                      padding: EdgeInsets.zero, 
-                      children: [
-                        StudentInfoForm(
-                          onProfileChanged: _onProfileChanged,
-                          initialProfile: _currentProfile,
-                        ),
-                        const SizedBox(height: 12), 
-                        _buildActionButtons(),
-                        if (_completedCourses.isNotEmpty || _incompleteCourses.isNotEmpty) ...[
-                          const SizedBox(height: 12), 
-                          _buildCourseStatusDisplay(),
-                        ],
-                        // Small gap before recommendations if the status display is shown
-                        if (_completedCourses.isNotEmpty || _incompleteCourses.isNotEmpty)
+      body:
+          _isLoadingData
+              ? const Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CircularProgressIndicator(),
+                    SizedBox(height: 16),
+                    Text('Loading course data...'),
+                  ],
+                ),
+              )
+              : Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12.0,
+                  vertical: 8.0,
+                ), // Reduced overall padding
+                child: Column(
+                  children: [
+                    // Student Information Form and related sections
+                    Expanded(
+                      flex: 1, // Now takes half the space
+                      child: ListView(
+                        padding: EdgeInsets.zero,
+                        children: [
+                          StudentInfoForm(
+                            onProfileChanged: _onProfileChanged,
+                            initialProfile: _currentProfile,
+                          ),
                           const SizedBox(height: 12),
-                      ],
+                          _buildActionButtons(),
+                          if (_completedCourses.isNotEmpty ||
+                              _incompleteCourses.isNotEmpty) ...[
+                            const SizedBox(height: 12),
+                            _buildCourseStatusDisplay(),
+                          ],
+                          // Small gap before recommendations if the status display is shown
+                          if (_completedCourses.isNotEmpty ||
+                              _incompleteCourses.isNotEmpty)
+                            const SizedBox(height: 12),
+                        ],
+                      ),
                     ),
-                  ),
-                                    
-                  // Recommendations Display
-                  Expanded(
-                    flex: 1, // Now takes the other half of the space
-                    child: RecommendationsDisplay(
-                      recommendedCourses: _recommendedCourses,
-                      profile: _currentProfile,
-                      allCourses: _getAllCourses(),
-                      isLoading: _isGeneratingPlan,
+
+                    // Recommendations Display
+                    Expanded(
+                      flex: 1, // Now takes the other half of the space
+                      child: RecommendationsDisplay(
+                        recommendedCourses: _recommendedCourses,
+                        profile: _currentProfile,
+                        allCourses: _getAllCourses(),
+                        isLoading: _isGeneratingPlan,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
     );
   }
 
@@ -319,7 +342,10 @@ class _GuidanceScreenState extends State<GuidanceScreen> {
               child: ElevatedButton.icon(
                 onPressed: _selectCompletedCourses,
                 icon: const Icon(Icons.check_circle, size: 18),
-                label: Text('Completed Courses (${_completedCourses.length})', style: const TextStyle(fontSize: 14)),
+                label: Text(
+                  'Completed Courses (${_completedCourses.length})',
+                  style: const TextStyle(fontSize: 14),
+                ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.green[100],
                   foregroundColor: Colors.green[800],
@@ -333,7 +359,10 @@ class _GuidanceScreenState extends State<GuidanceScreen> {
               child: ElevatedButton.icon(
                 onPressed: _selectIncompleteCourses,
                 icon: const Icon(Icons.pending, size: 18),
-                label: Text('Incomplete Courses (${_incompleteCourses.length})', style: const TextStyle(fontSize: 14)),
+                label: Text(
+                  'Incomplete Courses (${_incompleteCourses.length})',
+                  style: const TextStyle(fontSize: 14),
+                ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.orange[100],
                   foregroundColor: Colors.orange[800],
@@ -347,7 +376,10 @@ class _GuidanceScreenState extends State<GuidanceScreen> {
               child: ElevatedButton.icon(
                 onPressed: _generateStudyPlan,
                 icon: const Icon(Icons.auto_awesome, size: 18),
-                label: const Text('Generate Study Plan', style: TextStyle(fontSize: 14)),
+                label: const Text(
+                  'Generate Study Plan',
+                  style: TextStyle(fontSize: 14),
+                ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color.fromRGBO(1, 87, 155, 1),
                   foregroundColor: Colors.white,
@@ -372,34 +404,58 @@ class _GuidanceScreenState extends State<GuidanceScreen> {
             if (_completedCourses.isNotEmpty) ...[
               Text(
                 'Completed Courses (${_completedCourses.length}):',
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 13,
+                ),
               ),
               const SizedBox(height: 4),
               Wrap(
                 spacing: 3,
                 runSpacing: 3,
-                children: _completedCourses.map((code) => Chip(
-                  label: Text(code, style: const TextStyle(fontSize: 11)),
-                  backgroundColor: Colors.green[100],
-                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                )).toList(),
+                children:
+                    _completedCourses
+                        .map(
+                          (code) => Chip(
+                            label: Text(
+                              code,
+                              style: const TextStyle(fontSize: 11),
+                            ),
+                            backgroundColor: Colors.green[100],
+                            materialTapTargetSize:
+                                MaterialTapTargetSize.shrinkWrap,
+                          ),
+                        )
+                        .toList(),
               ),
               if (_incompleteCourses.isNotEmpty) const SizedBox(height: 8),
             ],
             if (_incompleteCourses.isNotEmpty) ...[
               Text(
                 'Incomplete Courses (${_incompleteCourses.length}):',
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 13,
+                ),
               ),
               const SizedBox(height: 4),
               Wrap(
                 spacing: 3,
                 runSpacing: 3,
-                children: _incompleteCourses.map((code) => Chip(
-                  label: Text(code, style: const TextStyle(fontSize: 11)),
-                  backgroundColor: Colors.orange[100],
-                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                )).toList(),
+                children:
+                    _incompleteCourses
+                        .map(
+                          (code) => Chip(
+                            label: Text(
+                              code,
+                              style: const TextStyle(fontSize: 11),
+                            ),
+                            backgroundColor: Colors.orange[100],
+                            materialTapTargetSize:
+                                MaterialTapTargetSize.shrinkWrap,
+                          ),
+                        )
+                        .toList(),
               ),
             ],
           ],
@@ -409,32 +465,37 @@ class _GuidanceScreenState extends State<GuidanceScreen> {
   }
 
   void _showDataInfo() {
-    final totalCourses = _departmentCourses.values
-        .fold<int>(0, (sum, courses) => sum + courses.length);
-    
+    final totalCourses = _departmentCourses.values.fold<int>(
+      0,
+      (sum, courses) => sum + courses.length,
+    );
+
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Course Data Information'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Total Departments: ${_departmentCourses.length}'),
-            Text('Total Courses: $totalCourses'),
-            const SizedBox(height: 8),
-            ..._departmentCourses.entries.map((entry) => 
-              Text('${entry.key.toUpperCase()}: ${entry.value.length} courses')
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Course Data Information'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Total Departments: ${_departmentCourses.length}'),
+                Text('Total Courses: $totalCourses'),
+                const SizedBox(height: 8),
+                ..._departmentCourses.entries.map(
+                  (entry) => Text(
+                    '${entry.key.toUpperCase()}: ${entry.value.length} courses',
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Close'),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 }
