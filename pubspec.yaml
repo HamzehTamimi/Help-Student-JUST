@@ -49,6 +49,8 @@ dependencies:
   location: ^8.0.0
   google_maps_flutter: ^2.12.2
   permission_handler: ^11.0.1
+  flutter_polyline_points: ^2.1.0
+  pdfx: ^2.9.1
 
 dev_dependencies:
   flutter_test:

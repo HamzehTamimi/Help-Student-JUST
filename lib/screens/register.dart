@@ -30,6 +30,8 @@ class RegisterPage extends StatefulWidget {
 
 class _RegisterPageState extends State<RegisterPage> {
   final _formKey = GlobalKey<FormState>();
+  final _nameController =
+      TextEditingController(); // Controller for the name field
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isLoading = false;
@@ -40,6 +42,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
   @override
   void dispose() {
+    _nameController.dispose(); // Dispose the new name controller
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
@@ -59,9 +62,17 @@ class _RegisterPageState extends State<RegisterPage> {
               email: _emailController.text.trim(),
               password: _passwordController.text.trim(),
             );
+
         if (userCredential.user != null) {
+          // Update the user's display name with the entered name
+          await userCredential.user!.updateDisplayName(
+            _nameController.text.trim(),
+          );
+
           // ignore: avoid_print
-          print('Registered! User UID: ${userCredential.user!.uid}');
+          print(
+            'Registered! User UID: ${userCredential.user!.uid}, Name: ${userCredential.user!.displayName}',
+          );
           // You might want to send the user to a new page after successful registration
           // For now, we'll pop back to the login page after successful registration.
           if (mounted) {
@@ -89,6 +100,11 @@ class _RegisterPageState extends State<RegisterPage> {
         }
       }
     }
+  }
+
+  String? _validateName(String? value) {
+    if (value == null || value.isEmpty) return 'Name is required';
+    return null;
   }
 
   String? _validateEmail(String? value) {
@@ -151,6 +167,28 @@ class _RegisterPageState extends State<RegisterPage> {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: <Widget>[
+                          // New Name input field
+                          TextFormField(
+                            controller: _nameController,
+                            validator: _validateName,
+                            keyboardType: TextInputType.text,
+                            decoration: InputDecoration(
+                              labelText: 'Name',
+                              hintText: 'Enter your full name',
+                              prefixIcon: const Icon(Icons.person),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10.0),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10.0),
+                                borderSide: const BorderSide(
+                                  color: _primaryBlue,
+                                  width: 2.0,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 20),
                           TextFormField(
                             controller: _emailController,
                             validator: _validateEmail,

@@ -53,14 +53,22 @@ class RecommendationsDisplay extends StatelessWidget {
         // Course List Header
         _buildCourseListHeader(),
 
-        // Course List
+        // Course List (making the table height larger)
         Expanded(
-          child: ListView.builder(
-            itemCount: recommendedCourses.length,
-            itemBuilder: (context, index) {
-              final course = recommendedCourses[index];
-              return _buildCourseCard(course, context);
-            },
+          // Keep Expanded to allow it to take available space
+          child: ConstrainedBox(
+            // Use ConstrainedBox to ensure a minimum height
+            constraints: const BoxConstraints(
+              minHeight:
+                  300, // Adjust this value to your desired minimum height
+            ),
+            child: ListView.builder(
+              itemCount: recommendedCourses.length,
+              itemBuilder: (context, index) {
+                final course = recommendedCourses[index];
+                return _buildCourseCard(course, context);
+              },
+            ),
           ),
         ),
       ],

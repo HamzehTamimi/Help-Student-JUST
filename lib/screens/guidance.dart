@@ -291,7 +291,8 @@ class _GuidanceScreenState extends State<GuidanceScreen> {
                   children: [
                     // Student Information Form and related sections
                     Expanded(
-                      flex: 1, // Now takes half the space
+                      flex:
+                          1, // This will make it take 50% of the available space
                       child: ListView(
                         padding: EdgeInsets.zero,
                         children: [
@@ -316,7 +317,8 @@ class _GuidanceScreenState extends State<GuidanceScreen> {
 
                     // Recommendations Display
                     Expanded(
-                      flex: 1, // Now takes the other half of the space
+                      flex:
+                          1, // This will also make it take 50% of the available space
                       child: RecommendationsDisplay(
                         recommendedCourses: _recommendedCourses,
                         profile: _currentProfile,
