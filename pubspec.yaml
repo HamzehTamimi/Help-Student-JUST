@@ -46,6 +46,9 @@ dependencies:
   pdf: ^3.11.3
   open_file: ^3.5.10
   flutter_pdfview: ^1.4.0+1
+  location: ^8.0.0
+  google_maps_flutter: ^2.12.2
+  permission_handler: ^11.0.1
 
 dev_dependencies:
   flutter_test:

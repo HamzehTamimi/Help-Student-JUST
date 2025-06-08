@@ -17,7 +17,15 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Student Helper',
-      theme: ThemeData(primarySwatch: Colors.blue),
+      theme: ThemeData(
+        // Change this from purple to another color, e.g., blue
+        primarySwatch: Colors.blue,
+        // Optional: Use ColorScheme for more control (especially with Material 3)
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Color.fromRGBO(1, 87, 155, 1),
+        ),
+        useMaterial3: true,
+      ),
       home: const LoginPage(),
       debugShowCheckedModeBanner: false,
     );

@@ -86,7 +86,7 @@ class MapCard extends StatelessWidget {
       title: "Maps",
       description:
           "Navigate and find locations within your university campus including classrooms, labs, and facilities",
-      targetPage: Map(),
+      targetPage: MyMapPage(),
       backgroundColor: const Color.fromRGBO(255, 235, 238, 1), // Light red/pink
       borderColor: const Color.fromRGBO(244, 67, 54, 1), // Red
       iconColor: const Color.fromRGBO(183, 28, 28, 1), // Dark red
