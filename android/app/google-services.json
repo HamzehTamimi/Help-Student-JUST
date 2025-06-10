@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "747266049180",
+    "firebase_url": "https://help-student-402ab-default-rtdb.firebaseio.com",
     "project_id": "help-student-402ab",
     "storage_bucket": "help-student-402ab.firebasestorage.app"
   },
@@ -12,7 +13,12 @@
           "package_name": "com.just.helpstudent"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "747266049180-rt70oi9qu4tcuadokq8v2hkvecsqt1rj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyAvGmiKek_tyI-_ToIuo_ShCTHNRgczkM8"
@@ -20,7 +26,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "747266049180-rt70oi9qu4tcuadokq8v2hkvecsqt1rj.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "747266049180-01680rvinr2d0ukufofatbsk1id8i516.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.just.helpstudent"
+              }
+            }
+          ]
         }
       }
     }

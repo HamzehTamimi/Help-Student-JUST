@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:helpstudent/screens/marker_data_MAP.dart';
+import 'package:helpstudent/screens/marker_icons.dart';
+import 'package:helpstudent/utils/marker_data_MAP.dart';
+import 'package:helpstudent/utils/marker_icons.dart';
 import 'package:location/location.dart';
 
 class MyMapPage extends StatefulWidget {
@@ -16,15 +19,9 @@ class _MyMapPageState extends State<MyMapPage> {
   Set<Marker> _markers = {};
   bool _isLoading = true;
   MapType _mapType = MapType.normal;
-
-  late BitmapDescriptor _parkingIcon;
-  late BitmapDescriptor _salahIcon;
-  late BitmapDescriptor _stadiumIcon;
-  late BitmapDescriptor _studentIcon;
-
   LatLng? _currentLocation;
   double _currentZoom = 14.0;
-
+  // ignore: unused_field
   String? _selectedMarkerId;
 
   @override
@@ -34,123 +31,57 @@ class _MyMapPageState extends State<MyMapPage> {
   }
 
   Future<void> _initMap() async {
-    await _loadCustomIcons();
+    await MarkerIcons.loadAll();
     await _loadMarkers();
     await _getUserLocation();
   }
 
-  Future<void> _loadCustomIcons() async {
-    try {
-      _parkingIcon = await BitmapDescriptor.fromAssetImage(
-        const ImageConfiguration(size: Size(48, 48)),
-        'img/icons8-parking-48.png',
-      );
-
-      _salahIcon = await BitmapDescriptor.fromAssetImage(
-        const ImageConfiguration(size: Size(48, 48)),
-        'img/icons8-classroom-50.png',
-      );
-
-      _stadiumIcon = await BitmapDescriptor.fromAssetImage(
-        const ImageConfiguration(size: Size(48, 48)),
-        'img/icons8-stadium-40.png',
-      );
-      _studentIcon = await BitmapDescriptor.fromAssetImage(
-        const ImageConfiguration(size: Size(48, 48)),
-        'img/icons8-student-center-48.png',
-      );
-    } catch (e) {
-      print('Icon load error: $e');
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('فشل تحميل الأيقونات: $e')));
-    }
-  }
-
   Future<void> _getUserLocation() async {
     Location location = Location();
-    bool serviceEnabled;
-    PermissionStatus permissionGranted;
-
-    serviceEnabled = await location.serviceEnabled();
-    if (!serviceEnabled) {
-      serviceEnabled = await location.requestService();
-      if (!serviceEnabled) return;
-    }
-
-    permissionGranted = await location.hasPermission();
-    if (permissionGranted == PermissionStatus.denied) {
-      permissionGranted = await location.requestPermission();
-      if (permissionGranted != PermissionStatus.granted) return;
-    }
-
-    final locData = await location.getLocation();
+    if (!(await location.serviceEnabled()) &&
+        !(await location.requestService()))
+      return;
+    if (await location.hasPermission() == PermissionStatus.denied &&
+        await location.requestPermission() != PermissionStatus.granted)
+      return;
+    final loc = await location.getLocation();
     setState(() {
-      _currentLocation = LatLng(locData.latitude!, locData.longitude!);
+      _currentLocation = LatLng(loc.latitude!, loc.longitude!);
     });
   }
 
   Future<void> _loadMarkers() async {
     setState(() => _isLoading = true);
-    _markers = await _loadHardcodedMarkers();
+    _markers = await _buildMarkers();
     setState(() => _isLoading = false);
   }
 
-  Future<Set<Marker>> _loadHardcodedMarkers() async {
-    final markers = <Marker>{};
-
+  Future<Set<Marker>> _buildMarkers() async {
+    final Set<Marker> markers = {};
     for (final data in markerData) {
-      String? id = data['ty'] as String?;
-      bool isSelected = id == _selectedMarkerId;
+      final id = data['id'] as String;
+      final lat = (data['lat'] as num).toDouble();
+      final lng = (data['lng'] as num).toDouble();
+      final title = data['title'] as String;
 
-      BitmapDescriptor icon;
-      if (id == 'موقف') {
-        icon =
-            isSelected
-                ? await BitmapDescriptor.fromAssetImage(
-                  const ImageConfiguration(size: Size(64, 64)),
-                  'img/icons8-parking-48.png',
-                )
-                : _parkingIcon;
-      } else if (id == 'صلاح الدين') {
-        icon =
-            isSelected
-                ? await BitmapDescriptor.fromAssetImage(
-                  const ImageConfiguration(size: Size(64, 64)),
-                  'img/icons8-classroom-50.png',
-                )
-                : _salahIcon;
-      } else {
-        icon =
-            isSelected
-                ? BitmapDescriptor.defaultMarkerWithHue(
-                  BitmapDescriptor.hueBlue,
-                )
-                : BitmapDescriptor.defaultMarker;
-      }
+      final type = MarkerIcons.detectTypeFromId(id);
+      final icon = MarkerIcons.fromType(type);
 
       markers.add(
         Marker(
-          markerId: MarkerId(data['id'] as String),
-          position: LatLng(
-            (data['lat'] as num).toDouble(),
-            (data['lng'] as num).toDouble(),
-          ),
-          infoWindow: InfoWindow(title: data['title'] as String),
+          markerId: MarkerId(id),
+          position: LatLng(lat, lng),
+          infoWindow: InfoWindow(title: title),
           icon: icon,
-          onTap: () => _onMarkerTapped(data['id'] as String),
+          onTap: () => _onMarkerTapped(id),
         ),
       );
     }
-
     return markers;
   }
 
-  void _onMarkerTapped(String markerId) async {
-    setState(() {
-      _selectedMarkerId = markerId;
-    });
-    await _loadMarkers();
+  void _onMarkerTapped(String markerId) {
+    setState(() => _selectedMarkerId = markerId);
   }
 
   void _goToJUST() {
@@ -177,14 +108,14 @@ class _MyMapPageState extends State<MyMapPage> {
 
   void _zoomIn() {
     setState(() {
-      _currentZoom += 1;
+      _currentZoom++;
       mapController?.animateCamera(CameraUpdate.zoomTo(_currentZoom));
     });
   }
 
   void _zoomOut() {
     setState(() {
-      _currentZoom -= 1;
+      _currentZoom--;
       mapController?.animateCamera(CameraUpdate.zoomTo(_currentZoom));
     });
   }
@@ -212,25 +143,25 @@ class _MyMapPageState extends State<MyMapPage> {
       body: SafeArea(
         child: Stack(
           children: [
-            _isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : GoogleMap(
-                  onMapCreated: (controller) => mapController = controller,
-                  initialCameraPosition: CameraPosition(
-                    target: _center,
-                    zoom: _currentZoom,
-                  ),
-                  markers: _markers,
-                  mapType: _mapType,
-                  myLocationEnabled: true,
-                  myLocationButtonEnabled: false,
-                  zoomControlsEnabled: false,
+            if (_isLoading)
+              const Center(child: CircularProgressIndicator())
+            else
+              GoogleMap(
+                onMapCreated: (c) => mapController = c,
+                initialCameraPosition: CameraPosition(
+                  target: _center,
+                  zoom: _currentZoom,
                 ),
+                markers: _markers,
+                mapType: _mapType,
+                myLocationEnabled: true,
+                myLocationButtonEnabled: false,
+                zoomControlsEnabled: false,
+              ),
             Positioned(
               bottom: 100,
               right: 16,
               child: Column(
-                mainAxisSize: MainAxisSize.min,
                 children: [
                   FloatingActionButton(
                     heroTag: 'zoomIn',
@@ -252,7 +183,6 @@ class _MyMapPageState extends State<MyMapPage> {
               bottom: 16,
               left: 16,
               child: Column(
-                mainAxisSize: MainAxisSize.min,
                 children: [
                   FloatingActionButton(
                     heroTag: 'locate',

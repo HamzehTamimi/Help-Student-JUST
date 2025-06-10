@@ -54,6 +54,10 @@ class _GPACalculatorScreenState extends State<GPACalculatorScreen> {
     'F': 0.5,
   };
 
+  get totalCredits => null;
+
+  get totalPoints => null;
+
   void _calculateGpa() {
     double totalPointsThisSemester = 0.0;
     double totalCreditsThisSemester = 0.0;

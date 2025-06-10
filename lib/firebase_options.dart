@@ -46,6 +46,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '747266049180',
     projectId: 'help-student-402ab',
     authDomain: 'help-student-402ab.firebaseapp.com',
+    databaseURL: 'https://help-student-402ab-default-rtdb.firebaseio.com',
     storageBucket: 'help-student-402ab.firebasestorage.app',
     measurementId: 'G-JLH347K3L4',
   );
@@ -55,6 +56,7 @@ class DefaultFirebaseOptions {
     appId: '1:747266049180:android:2228e31a536585df729959',
     messagingSenderId: '747266049180',
     projectId: 'help-student-402ab',
+    databaseURL: 'https://help-student-402ab-default-rtdb.firebaseio.com',
     storageBucket: 'help-student-402ab.firebasestorage.app',
   );
 
@@ -63,7 +65,9 @@ class DefaultFirebaseOptions {
     appId: '1:747266049180:ios:16c62cefc921013c729959',
     messagingSenderId: '747266049180',
     projectId: 'help-student-402ab',
+    databaseURL: 'https://help-student-402ab-default-rtdb.firebaseio.com',
     storageBucket: 'help-student-402ab.firebasestorage.app',
+    iosClientId: '747266049180-01680rvinr2d0ukufofatbsk1id8i516.apps.googleusercontent.com',
     iosBundleId: 'com.just.helpstudent',
   );
 
@@ -72,7 +76,9 @@ class DefaultFirebaseOptions {
     appId: '1:747266049180:ios:16c62cefc921013c729959',
     messagingSenderId: '747266049180',
     projectId: 'help-student-402ab',
+    databaseURL: 'https://help-student-402ab-default-rtdb.firebaseio.com',
     storageBucket: 'help-student-402ab.firebasestorage.app',
+    iosClientId: '747266049180-01680rvinr2d0ukufofatbsk1id8i516.apps.googleusercontent.com',
     iosBundleId: 'com.just.helpstudent',
   );
 
@@ -82,7 +88,9 @@ class DefaultFirebaseOptions {
     messagingSenderId: '747266049180',
     projectId: 'help-student-402ab',
     authDomain: 'help-student-402ab.firebaseapp.com',
+    databaseURL: 'https://help-student-402ab-default-rtdb.firebaseio.com',
     storageBucket: 'help-student-402ab.firebasestorage.app',
     measurementId: 'G-N9QRT28DFE',
   );
+
 }

@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:helpstudent/screens/guidance.dart';
-import 'package:helpstudent/screens/cv.dart';
 import 'package:helpstudent/screens/comingsoon.dart';
+import 'package:helpstudent/screens/cv.dart';
 import 'package:helpstudent/screens/gpa.dart';
+import 'package:helpstudent/screens/guidance.dart';
 import 'package:helpstudent/screens/map.dart';
-// ignore: unused_import
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class Homescreen extends StatelessWidget {
   const Homescreen({super.key});
@@ -22,7 +20,6 @@ class Homescreen extends StatelessWidget {
           GuidanceCard(),
           ITSpecialtyCard(),
           GPACard(),
-
           MapCard(),
           CVCard(),
         ],
@@ -95,7 +92,7 @@ class MapCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CustomCard(Icons.location_on, "Maps", MyMapPage());
+    return const CustomCard(Icons.location_on, "Maps", MyMapPage());
   }
 }
 
@@ -126,7 +123,7 @@ class CVCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const CustomCard(Icons.person, "CV", CV());
+    return const CustomCard(Icons.person, "CV", CVFormScreen());
   }
 }
 
