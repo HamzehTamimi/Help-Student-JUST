@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:helpstudent/cards/cards.dart';
-import 'package:helpstudent/screens/settings.dart';
+import 'package:helpstudent/screens/about.dart';
+import 'package:firebase_auth/firebase_auth.dart'; // Import Firebase Auth
 
 class Homescreen extends StatefulWidget {
   const Homescreen({super.key});
@@ -38,139 +39,87 @@ class _HomescreenState extends State<Homescreen> {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => SettingsPage()),
+            MaterialPageRoute(builder: (context) => const AboutPage()),
           );
         },
-        foregroundColor: Color.fromRGBO(187, 222, 251, 1),
-        backgroundColor: Color.fromRGBO(1, 87, 155, 1),
-        tooltip: "Settings",
-        child: Icon(Icons.settings),
+        foregroundColor: const Color.fromRGBO(187, 222, 251, 1),
+        backgroundColor: const Color.fromRGBO(1, 87, 155, 1),
+        tooltip: "About",
+        child: const Icon(Icons.info),
       ),
       appBar: AppBar(
-        title: const Text('Help Student'),
-        backgroundColor: Color.fromRGBO(187, 222, 251, 1),
+        title: const Text(
+          'Help Student',
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
+        ),
+        backgroundColor: const Color.fromRGBO(187, 222, 251, 1),
         centerTitle: true,
         automaticallyImplyLeading: false,
+        elevation: 2,
       ),
-      body: GridView.count(
-        crossAxisCount: 1,
-        childAspectRatio: (1 / .7),
-        children: <Widget>[
-          GuidanceCard(),
-          ITSpecialtyCard(),
-          GPACard(),
-          MapCard(),
-          CVCard(),
-        ],
-      ),
-    );
-  }
-}
-
-class CustomCard extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final Widget targetPage;
-
-  const CustomCard(this.icon, this.title, this.targetPage, {super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.all(15),
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        border: Border.all(
-          color: const Color.fromRGBO(100, 181, 246, 1),
-          width: 2,
-        ),
-        color: const Color.fromRGBO(187, 222, 251, 1),
-        borderRadius: BorderRadius.circular(28),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Icon(icon, size: 100, color: const Color.fromRGBO(1, 87, 155, 1)),
-          const SizedBox(height: 10),
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Color.fromRGBO(1, 87, 155, 1),
-            ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 10),
-          TextButton(
-            style: TextButton.styleFrom(
-              backgroundColor: const Color.fromRGBO(1, 87, 155, 1),
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Welcome section with logo and dynamic name
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 24.0),
+              child: Center(
+                child: Column(
+                  children: [
+                    // Replaced Icon with Image.asset for uni_logo.png
+                    Image.asset(
+                      'images/uni_logo.png', // Path to your logo image
+                      width: 120, // Adjust size as needed
+                      height: 120, // Adjust size as needed
+                      // You might want to add a color filter if the logo isn't white
+                      // color: Color.fromRGBO(1, 87, 155, 1),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Welcome, $_userName!', // Dynamic welcome message using the user's name
+                      style: const TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                        color: Color.fromRGBO(
+                          1,
+                          87,
+                          155,
+                          1,
+                        ), // Primary blue color for the text
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 8),
+                    const Text(
+                      'How can we help you today?', // A friendly follow-up message
+                      style: TextStyle(fontSize: 18, color: Colors.grey),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
               ),
             ),
-            child: const Text('Go To Page'),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => targetPage),
-              );
-            },
-          ),
-        ],
+            // Cards section
+            ListView(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              children: const <Widget>[
+                GuidanceCard(),
+                ITSpecialtyCard(),
+                GPACard(),
+                MapCard(),
+                CVCard(),
+              ],
+            ),
+            // Footer spacing
+            const SizedBox(
+              height: 80,
+            ), // Extra space for floating action button
+          ],
+        ),
       ),
     );
-  }
-}
-
-class MapCard extends StatelessWidget {
-  const MapCard({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const CustomCard(Icons.location_on, "Maps", MyMapPage());
-  }
-}
-
-class GPACard extends StatelessWidget {
-  const GPACard({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const CustomCard(
-      Icons.calculate,
-      "Calculate GPA",
-      GPACalculatorApp(),
-    );
-  }
-}
-
-class ITSpecialtyCard extends StatelessWidget {
-  const ITSpecialtyCard({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const CustomCard(Icons.computer, "IT Specialties", ComingSoon());
-  }
-}
-
-class CVCard extends StatelessWidget {
-  const CVCard({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const CustomCard(Icons.person, "CV", CVFormScreen());
-  }
-}
-
-class GuidanceCard extends StatelessWidget {
-  const GuidanceCard({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const CustomCard(Icons.school, "Guidance", GuidanceScreen());
   }
 }

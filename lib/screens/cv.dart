@@ -1,11 +1,9 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
-// ignore: depend_on_referenced_packages
-import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
-import "package:pdf/widgets.dart" as pw;
+import 'package:pdf/widgets.dart' as pw;
+import 'dart:io';
+import 'package:open_file/open_file.dart';
 
 void main() {
   runApp(const MyApp());
@@ -52,36 +50,44 @@ class MyApp extends StatelessWidget {
     );
   }
 
+  // Helper method to convert Color to MaterialColor
   static MaterialColor createMaterialColor(Color color) {
     final strengths = <double>[.05];
     final swatch = <int, Color>{};
-    final r = color.red, g = color.green, b = color.blue;
+    final int r = color.red;
+    final int g = color.green;
+    final int b = color.blue;
+
     for (int i = 1; i < 10; i++) {
       strengths.add(0.1 * i);
     }
-    strengths.forEach((strength) {
+    for (var strength in strengths) {
       final double opacity = strength == .05 ? .1 : strength;
       swatch[(strength * 10).round()] = color.withOpacity(opacity);
-    });
+    }
     return MaterialColor(color.value, swatch);
   }
 }
 
 class CVFormScreen extends StatefulWidget {
-  const CVFormScreen({Key? key}) : super(key: key);
+  const CVFormScreen({super.key});
 
   @override
-  State<CVFormScreen> createState() => _CVFormScreenState();
+  CVFormScreenState createState() => CVFormScreenState();
 }
 
-class _CVFormScreenState extends State<CVFormScreen> {
+class CVFormScreenState extends State<CVFormScreen> {
   final _formKey = GlobalKey<FormState>();
-  final nameController = TextEditingController();
-  final emailController = TextEditingController();
-  final phoneController = TextEditingController();
-  final addressController = TextEditingController();
-  final summaryController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _addressController = TextEditingController();
+  final TextEditingController _summaryController = TextEditingController();
 
+  List<StudentEducation> educationList = [StudentEducation()];
+  List<Project> projects = [Project()];
+  List<String> certifications = [''];
+  List<String> skills = [''];
   bool isLoading = false;
 
   @override
@@ -127,7 +133,7 @@ class _CVFormScreenState extends State<CVFormScreen> {
                       ...educationList.asMap().entries.map((entry) {
                         final index = entry.key;
                         return _buildEducationFields(index);
-                      }).toList(),
+                      }),
                       _buildActionButton(
                         icon: Icons.add,
                         onPressed: () {
@@ -142,7 +148,7 @@ class _CVFormScreenState extends State<CVFormScreen> {
                       ...projects.asMap().entries.map((entry) {
                         final index = entry.key;
                         return _buildProjectFields(index);
-                      }).toList(),
+                      }),
                       _buildActionButton(
                         icon: Icons.add,
                         onPressed: () {
@@ -157,7 +163,7 @@ class _CVFormScreenState extends State<CVFormScreen> {
                       ...certifications.asMap().entries.map((e) {
                         int index = e.key;
                         return _buildCertificationField(index);
-                      }).toList(),
+                      }),
                       _buildActionButton(
                         icon: Icons.add,
                         onPressed: () {
@@ -172,7 +178,7 @@ class _CVFormScreenState extends State<CVFormScreen> {
                       ...skills.asMap().entries.map((e) {
                         int index = e.key;
                         return _buildSkillField(index);
-                      }).toList(),
+                      }),
                       _buildActionButton(
                         icon: Icons.add,
                         onPressed: () {
@@ -236,11 +242,13 @@ class _CVFormScreenState extends State<CVFormScreen> {
 
   Widget _buildTextField(
     TextEditingController controller,
-    String label, {
+    String label,
+    IconData icon, {
     int maxLines = 1,
+    bool required = true,
   }) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      padding: const EdgeInsets.only(bottom: 16.0),
       child: TextFormField(
         controller: controller,
         decoration: InputDecoration(
@@ -518,74 +526,124 @@ class _CVFormScreenState extends State<CVFormScreen> {
     });
     try {
       final pdf = pw.Document();
+
+      // Define colors
+      final primaryColor = PdfColor.fromHex('#01579B');
+      final lightGray = PdfColor.fromHex('#F5F5F5');
+      final darkGray = PdfColor.fromHex('#424242');
+
       pdf.addPage(
         pw.Page(
           pageFormat: PdfPageFormat.a4,
+          margin: const pw.EdgeInsets.all(30),
           build: (pw.Context context) {
             return pw.Column(
               crossAxisAlignment: pw.CrossAxisAlignment.start,
               children: [
-                // Header
+                // Header Section with colored background
                 pw.Container(
-                  padding: const pw.EdgeInsets.only(bottom: 10),
+                  width: double.infinity,
+                  padding: const pw.EdgeInsets.all(20),
+                  decoration: pw.BoxDecoration(
+                    color: primaryColor,
+                    borderRadius: pw.BorderRadius.circular(8),
+                  ),
                   child: pw.Column(
                     crossAxisAlignment: pw.CrossAxisAlignment.start,
                     children: [
                       pw.Text(
-                        _nameController.text,
+                        _nameController.text.toUpperCase(),
                         style: pw.TextStyle(
-                          fontSize: 24,
+                          fontSize: 28,
                           fontWeight: pw.FontWeight.bold,
+                          color: PdfColors.white,
                         ),
                       ),
                       pw.SizedBox(height: 8),
                       pw.Row(
                         children: [
                           if (_emailController.text.isNotEmpty)
-                            pw.Text(_emailController.text),
+                            pw.Text(
+                              _emailController.text,
+                              style: pw.TextStyle(
+                                fontSize: 12,
+                                color: PdfColors.white,
+                              ),
+                            ),
                           if (_emailController.text.isNotEmpty &&
                               _phoneController.text.isNotEmpty)
-                            pw.Text(' | '),
+                            pw.Container(
+                              margin: const pw.EdgeInsets.symmetric(
+                                horizontal: 8,
+                              ),
+                              child: pw.Text(
+                                ' • ',
+                                style: pw.TextStyle(color: PdfColors.white),
+                              ),
+                            ),
                           if (_phoneController.text.isNotEmpty)
-                            pw.Text(_phoneController.text),
+                            pw.Text(
+                              _phoneController.text,
+                              style: pw.TextStyle(
+                                fontSize: 12,
+                                color: PdfColors.white,
+                              ),
+                            ),
                         ],
                       ),
                       if (_addressController.text.isNotEmpty)
-                        pw.Text(_addressController.text),
+                        pw.Container(
+                          margin: const pw.EdgeInsets.only(top: 4),
+                          child: pw.Text(
+                            _addressController.text,
+                            style: pw.TextStyle(
+                              fontSize: 12,
+                              color: PdfColors.white,
+                            ),
+                          ),
+                        ),
                     ],
                   ),
                 ),
-                // Summary
+                pw.SizedBox(height: 25),
+
+                // Summary Section
                 if (_summaryController.text.isNotEmpty) ...[
+                  _buildSectionHeader('PROFESSIONAL SUMMARY', primaryColor),
                   pw.Container(
-                    decoration: const pw.BoxDecoration(
-                      border: pw.Border(bottom: pw.BorderSide(width: 1)),
+                    padding: const pw.EdgeInsets.all(15),
+                    decoration: pw.BoxDecoration(
+                      color: lightGray,
+                      borderRadius: pw.BorderRadius.circular(5),
                     ),
                     child: pw.Text(
-                      'OBJECTIVE / SUMMARY',
-                      style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                      _summaryController.text,
+                      style: pw.TextStyle(
+                        fontSize: 11,
+                        lineSpacing: 1.4,
+                        color: darkGray,
+                      ),
                     ),
                   ),
-                  pw.SizedBox(height: 5),
-                  pw.Text(_summaryController.text),
-                  pw.SizedBox(height: 10),
+                  pw.SizedBox(height: 20),
                 ],
-                // Education
+
+                // Education Section
                 if (educationList.isNotEmpty &&
                     educationList[0].degree.isNotEmpty) ...[
-                  pw.Container(
-                    decoration: const pw.BoxDecoration(
-                      border: pw.Border(bottom: pw.BorderSide(width: 1)),
-                    ),
-                    child: pw.Text(
-                      'EDUCATION',
-                      style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-                    ),
-                  ),
-                  pw.SizedBox(height: 5),
-                  ...educationList.map((edu) {
+                  _buildSectionHeader('EDUCATION', primaryColor),
+                  ...educationList.where((edu) => edu.degree.isNotEmpty).map((
+                    edu,
+                  ) {
                     return pw.Container(
-                      margin: const pw.EdgeInsets.only(bottom: 10),
+                      margin: const pw.EdgeInsets.only(bottom: 12),
+                      padding: const pw.EdgeInsets.all(12),
+                      decoration: pw.BoxDecoration(
+                        border: pw.Border.all(
+                          color: PdfColor.fromHex('#E0E0E0'),
+                        ),
+                        borderRadius: pw.BorderRadius.circular(5),
+                      ),
                       child: pw.Column(
                         crossAxisAlignment: pw.CrossAxisAlignment.start,
                         children: [
@@ -593,155 +651,267 @@ class _CVFormScreenState extends State<CVFormScreen> {
                             mainAxisAlignment:
                                 pw.MainAxisAlignment.spaceBetween,
                             children: [
-                              pw.Text(
-                                edu.degree,
-                                style: pw.TextStyle(
-                                  fontWeight: pw.FontWeight.bold,
+                              pw.Expanded(
+                                child: pw.Text(
+                                  edu.degree,
+                                  style: pw.TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: pw.FontWeight.bold,
+                                    color: darkGray,
+                                  ),
                                 ),
                               ),
-                              pw.Text(
-                                '${edu.startYear} - ${edu.endYear.isEmpty ? 'Present' : edu.endYear}',
+                              pw.Container(
+                                padding: const pw.EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 2,
+                                ),
+                                decoration: pw.BoxDecoration(
+                                  color: primaryColor,
+                                  borderRadius: pw.BorderRadius.circular(3),
+                                ),
+                                child: pw.Text(
+                                  '${edu.startYear} - ${edu.endYear.isEmpty ? 'Present' : edu.endYear}',
+                                  style: pw.TextStyle(
+                                    fontSize: 10,
+                                    color: PdfColors.white,
+                                    fontWeight: pw.FontWeight.bold,
+                                  ),
+                                ),
                               ),
                             ],
                           ),
-                          pw.Text(edu.institution),
+                          pw.SizedBox(height: 4),
+                          pw.Text(
+                            edu.institution,
+                            style: pw.TextStyle(
+                              fontSize: 11,
+                              color: darkGray,
+                              fontStyle: pw.FontStyle.italic,
+                            ),
+                          ),
                           if (edu.gpa.isNotEmpty)
-                            pw.Text('GPA / Grade: ${edu.gpa}'),
+                            pw.Container(
+                              margin: const pw.EdgeInsets.only(top: 4),
+                              child: pw.Text(
+                                'GPA/Grade: ${edu.gpa}',
+                                style: pw.TextStyle(
+                                  fontSize: 10,
+                                  color: primaryColor,
+                                  fontWeight: pw.FontWeight.bold,
+                                ),
+                              ),
+                            ),
                         ],
                       ),
                     );
-                  }).toList(),
+                  }),
+                  pw.SizedBox(height: 15),
                 ],
-                // Projects
+
+                // Projects Section
                 if (projects.isNotEmpty && projects[0].title.isNotEmpty) ...[
-                  pw.Container(
-                    decoration: const pw.BoxDecoration(
-                      border: pw.Border(bottom: pw.BorderSide(width: 1)),
-                    ),
-                    child: pw.Text(
-                      'PROJECTS',
-                      style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-                    ),
-                  ),
-                  pw.SizedBox(height: 5),
-                  ...projects.map((project) {
+                  _buildSectionHeader('PROJECTS', primaryColor),
+                  ...projects.where((project) => project.title.isNotEmpty).map((
+                    project,
+                  ) {
                     return pw.Container(
-                      margin: const pw.EdgeInsets.only(bottom: 10),
+                      margin: const pw.EdgeInsets.only(bottom: 12),
+                      padding: const pw.EdgeInsets.all(12),
+                      decoration: pw.BoxDecoration(
+                        border: pw.Border.all(
+                          color: PdfColor.fromHex('#E0E0E0'),
+                        ),
+                        borderRadius: pw.BorderRadius.circular(5),
+                      ),
                       child: pw.Column(
                         crossAxisAlignment: pw.CrossAxisAlignment.start,
                         children: [
                           pw.Text(
                             project.title,
-                            style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                            style: pw.TextStyle(
+                              fontSize: 13,
+                              fontWeight: pw.FontWeight.bold,
+                              color: primaryColor,
+                            ),
                           ),
-                          pw.Text(project.description),
+                          pw.SizedBox(height: 6),
+                          pw.Text(
+                            project.description,
+                            style: pw.TextStyle(
+                              fontSize: 11,
+                              lineSpacing: 1.3,
+                              color: darkGray,
+                            ),
+                          ),
                         ],
                       ),
                     );
-                  }).toList(),
+                  }),
+                  pw.SizedBox(height: 15),
                 ],
-                // Certifications
-                if (certifications.isNotEmpty &&
-                    certifications[0].isNotEmpty) ...[
-                  pw.Container(
-                    decoration: const pw.BoxDecoration(
-                      border: pw.Border(bottom: pw.BorderSide(width: 1)),
-                    ),
-                    child: pw.Text(
-                      'CERTIFICATIONS / ACHIEVEMENTS',
-                      style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-                    ),
-                  ),
-                  pw.SizedBox(height: 5),
-                  pw.Wrap(
-                    spacing: 6,
-                    runSpacing: 6,
-                    children:
-                        certifications
-                            .where((c) => c.isNotEmpty)
-                            .map(
-                              (c) => pw.Container(
-                                padding: const pw.EdgeInsets.symmetric(
-                                  horizontal: 6,
-                                  vertical: 2,
-                                ),
-                                decoration: pw.BoxDecoration(
-                                  borderRadius: pw.BorderRadius.circular(4),
-                                ),
-                                child: pw.Text(c),
+
+                // Skills and Certifications in two columns
+                pw.Row(
+                  crossAxisAlignment: pw.CrossAxisAlignment.start,
+                  children: [
+                    // Skills Column
+                    if (skills.isNotEmpty && skills[0].isNotEmpty)
+                      pw.Expanded(
+                        flex: 1,
+                        child: pw.Column(
+                          crossAxisAlignment: pw.CrossAxisAlignment.start,
+                          children: [
+                            _buildSectionHeader(
+                              'TECHNICAL SKILLS',
+                              primaryColor,
+                            ),
+                            pw.Container(
+                              padding: const pw.EdgeInsets.all(12),
+                              decoration: pw.BoxDecoration(
+                                color: lightGray,
+                                borderRadius: pw.BorderRadius.circular(5),
                               ),
-                            )
-                            .toList(),
-                  ),
-                ],
-                // Skills
-                if (skills.isNotEmpty && skills[0].isNotEmpty) ...[
-                  pw.Container(
-                    decoration: const pw.BoxDecoration(
-                      border: pw.Border(bottom: pw.BorderSide(width: 1)),
-                    ),
-                    child: pw.Text(
-                      'SKILLS',
-                      style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-                    ),
-                  ),
-                  pw.SizedBox(height: 5),
-                  pw.Wrap(
-                    spacing: 6,
-                    runSpacing: 6,
-                    children:
-                        skills
-                            .where((s) => s.isNotEmpty)
-                            .map(
-                              (s) => pw.Container(
-                                padding: const pw.EdgeInsets.symmetric(
-                                  horizontal: 6,
-                                  vertical: 2,
-                                ),
-                                decoration: pw.BoxDecoration(
-                                  borderRadius: pw.BorderRadius.circular(4),
-                                ),
-                                child: pw.Text(s),
+                              child: pw.Wrap(
+                                spacing: 6,
+                                runSpacing: 6,
+                                children:
+                                    skills
+                                        .where((s) => s.isNotEmpty)
+                                        .map(
+                                          (s) => pw.Container(
+                                            padding:
+                                                const pw.EdgeInsets.symmetric(
+                                                  horizontal: 8,
+                                                  vertical: 4,
+                                                ),
+                                            decoration: pw.BoxDecoration(
+                                              color: primaryColor,
+                                              borderRadius: pw
+                                                  .BorderRadius.circular(12),
+                                            ),
+                                            child: pw.Text(
+                                              s,
+                                              style: pw.TextStyle(
+                                                fontSize: 9,
+                                                color: PdfColors.white,
+                                                fontWeight: pw.FontWeight.bold,
+                                              ),
+                                            ),
+                                          ),
+                                        )
+                                        .toList(),
                               ),
-                            )
-                            .toList(),
-                  ),
-                ],
+                            ),
+                          ],
+                        ),
+                      ),
+
+                    if (skills.isNotEmpty &&
+                        skills[0].isNotEmpty &&
+                        certifications.isNotEmpty &&
+                        certifications[0].isNotEmpty)
+                      pw.SizedBox(width: 20),
+
+                    // Certifications Column
+                    if (certifications.isNotEmpty &&
+                        certifications[0].isNotEmpty)
+                      pw.Expanded(
+                        flex: 1,
+                        child: pw.Column(
+                          crossAxisAlignment: pw.CrossAxisAlignment.start,
+                          children: [
+                            _buildSectionHeader('CERTIFICATIONS', primaryColor),
+                            pw.Container(
+                              padding: const pw.EdgeInsets.all(12),
+                              decoration: pw.BoxDecoration(
+                                color: lightGray,
+                                borderRadius: pw.BorderRadius.circular(5),
+                              ),
+                              child: pw.Column(
+                                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                                children:
+                                    certifications
+                                        .where((c) => c.isNotEmpty)
+                                        .map(
+                                          (c) => pw.Container(
+                                            margin: const pw.EdgeInsets.only(
+                                              bottom: 6,
+                                            ),
+                                            child: pw.Row(
+                                              children: [
+                                                pw.Container(
+                                                  width: 4,
+                                                  height: 4,
+                                                  decoration: pw.BoxDecoration(
+                                                    color: primaryColor,
+                                                    shape: pw.BoxShape.circle,
+                                                  ),
+                                                ),
+                                                pw.SizedBox(width: 8),
+                                                pw.Expanded(
+                                                  child: pw.Text(
+                                                    c,
+                                                    style: pw.TextStyle(
+                                                      fontSize: 10,
+                                                      color: darkGray,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        )
+                                        .toList(),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
+                ),
               ],
             );
           },
         ),
       );
+
       final output = await getApplicationDocumentsDirectory();
       final file = File(
-        '${output.path}/student_cv_${DateTime.now().millisecondsSinceEpoch}.pdf',
+        '${output.path}/enhanced_student_cv_${DateTime.now().millisecondsSinceEpoch}.pdf',
       );
       await file.writeAsBytes(await pdf.save());
+
       setState(() {
         isLoading = false;
       });
+
       if (!mounted) return;
+
       // Show success message
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('CV saved successfully!'),
+          content: const Text('Enhanced CV saved successfully!'),
           action: SnackBarAction(
             label: 'Open',
             onPressed: () => OpenFile.open(file.path),
           ),
         ),
       );
+
       // Show dialog with file path
       showDialog(
         context: context,
         builder:
             (_) => AlertDialog(
-              title: const Text('CV Generated'),
+              title: const Text('Enhanced CV Generated'),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Your CV has been successfully created!'),
+                  const Text(
+                    'Your professional CV has been successfully created with enhanced styling!',
+                  ),
                   const SizedBox(height: 10),
                   Text(
                     'Saved to: ${file.path}',
@@ -756,10 +926,10 @@ class _CVFormScreenState extends State<CVFormScreen> {
                 ),
                 ElevatedButton(
                   onPressed: () => OpenFile.open(file.path),
-                  child: const Text('Open CV'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color.fromRGBO(1, 87, 155, 1),
                   ),
+                  child: const Text('Open CV'),
                 ),
               ],
             ),
@@ -772,6 +942,41 @@ class _CVFormScreenState extends State<CVFormScreen> {
         context,
       ).showSnackBar(SnackBar(content: Text('Error: $e')));
     }
+  }
+
+  // Helper method to build section headers
+  pw.Widget _buildSectionHeader(String title, PdfColor color) {
+    return pw.Container(
+      margin: const pw.EdgeInsets.only(bottom: 12),
+      child: pw.Row(
+        children: [
+          pw.Container(
+            width: 4,
+            height: 20,
+            decoration: pw.BoxDecoration(
+              color: color,
+              borderRadius: pw.BorderRadius.circular(2),
+            ),
+          ),
+          pw.SizedBox(width: 12),
+          pw.Text(
+            title,
+            style: pw.TextStyle(
+              fontSize: 16,
+              fontWeight: pw.FontWeight.bold,
+              color: color,
+            ),
+          ),
+          pw.Expanded(
+            child: pw.Container(
+              height: 1,
+              margin: const pw.EdgeInsets.only(left: 12),
+              decoration: pw.BoxDecoration(color: color.shade(0.3)),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 

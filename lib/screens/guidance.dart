@@ -177,91 +177,35 @@ class _GuidanceScreenState extends State<GuidanceScreen> {
         throw Exception("No courses available for selected specialty");
       }
 
-      // Fallback if the mapped department doesn't exist
-      if (!departmentsData.containsKey(selectedDepartment)) {
-        selectedDepartment = departmentsData.keys.first;
+      // Calculate completed credit hours based on actual course credits
+      int completedCredits = 0;
+      for (final courseCode in _completedCourses) {
+        final course = availableCourses.firstWhere(
+          (c) => c.code == courseCode,
+          orElse:
+              () => Course(
+                // Provide a default or handle unknown course codes
+                code: courseCode,
+                name: "Unknown",
+                year: 1,
+                semester: 1,
+                credits: 3, // Default to 3 credits if course not found
+                department: "unknown",
+              ),
+        );
+        completedCredits += course.credits;
       }
 
-      // Get courses for the selected department
-      final courses = Map<String, dynamic>.from(
-        departmentsData[selectedDepartment]['study_plan']['courses'] as Map,
+      final updatedProfile = _currentProfile!.copyWith(
+        completedCourses: _completedCourses,
+        incompleteCourses: _incompleteCourses,
+        completedCreditHours: completedCredits,
       );
 
-      // Filter eligible courses based on year and semester
-      final List<Map<String, dynamic>> eligibleCourses = [];
-
-      courses.forEach((courseCode, courseData) {
-        final courseInfo = Map<String, dynamic>.from(courseData as Map);
-        courseInfo['code'] = courseCode;
-
-        // Check if course is for current or future years/semesters
-        final courseYear = courseInfo['year'] is int ? courseInfo['year'] : 1;
-        final courseSemester =
-            courseInfo['semester'] is int ? courseInfo['semester'] : 1;
-
-        bool isEligible = false;
-
-        // Current year courses in current semester
-        if (courseYear == yearValue && courseSemester == semesterValue) {
-          isEligible = true;
-        }
-        // Previous years' courses that might be incomplete
-        else if (courseYear < yearValue) {
-          isEligible = true;
-        }
-        // Next semester courses if GPA is high
-        else if (courseYear == yearValue &&
-            courseSemester > semesterValue &&
-            gpa >= 3.0) {
-          isEligible = true;
-        }
-
-        // Check prerequisites
-        if (isEligible && courseInfo.containsKey('prerequisites')) {
-          final prerequisites = List<String>.from(
-            courseInfo['prerequisites'] as List,
-          );
-          // Simple check - in a real app, you'd verify if prerequisites are completed
-          if (prerequisites.any((prereq) => prereq.contains('Completion'))) {
-            if (yearValue < 3)
-              isEligible =
-                  false; // Require at least 3rd year for courses with completion prerequisites
-          }
-        }
-
-        if (isEligible && !incompleteCourses.contains(courseCode)) {
-          eligibleCourses.add(courseInfo);
-        }
-      });
-
-      // Sort courses by difficulty (year and prerequisites count)
-      eligibleCourses.sort((a, b) {
-        // Primary sort by year
-        final yearComparison = (a['year'] as int).compareTo(b['year'] as int);
-        if (yearComparison != 0) return yearComparison;
-
-        // Secondary sort by prerequisites count
-        final aPrereqCount =
-            a.containsKey('prerequisites')
-                ? (a['prerequisites'] as List).length
-                : 0;
-        final bPrereqCount =
-            b.containsKey('prerequisites')
-                ? (b['prerequisites'] as List).length
-                : 0;
-        return aPrereqCount.compareTo(bPrereqCount);
-      });
-
-      // Adjust number of courses based on GPA
-      int coursesToTake = 5; // Default
-      if (gpa >= 3.5) {
-        coursesToTake = 6; // More courses for high GPA
-      } else if (gpa < 2.5) {
-        coursesToTake = 4; // Fewer courses for low GPA
-      }
-
-      // Get final recommended courses
-      final recommendedList = eligibleCourses.take(coursesToTake).toList();
+      final recommendations = RecommendationService.generateRecommendations(
+        availableCourses: availableCourses,
+        profile: updatedProfile,
+      );
 
       setState(() {
         _currentProfile = updatedProfile;
