@@ -1,22 +1,61 @@
 import 'package:flutter/material.dart';
-import 'package:helpstudent/screens/comingsoon.dart';
-import 'package:helpstudent/screens/cv.dart';
-import 'package:helpstudent/screens/gpa.dart';
-import 'package:helpstudent/screens/guidance.dart';
-import 'package:helpstudent/screens/map.dart';
+import 'package:helpstudent/cards/cards.dart';
+import 'package:helpstudent/screens/settings.dart';
 
-class Homescreen extends StatelessWidget {
+class Homescreen extends StatefulWidget {
   const Homescreen({super.key});
+
+  @override
+  State<Homescreen> createState() => _HomescreenState();
+}
+
+class _HomescreenState extends State<Homescreen> {
+  String _userName = 'Student'; // Default name if not found
+  User? _currentUser; // Holds the current authenticated user
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserInfo(); // Call function to load user info when the widget initializes
+  }
+
+  // Asynchronously loads the current user's display name
+  Future<void> _loadUserInfo() async {
+    _currentUser =
+        FirebaseAuth.instance.currentUser; // Get the current authenticated user
+    if (_currentUser != null) {
+      setState(() {
+        // Update the userName state with the user's display name, or default to 'Student'
+        _userName = _currentUser!.displayName ?? 'Student';
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Student Helper'),
-        backgroundColor: const Color.fromRGBO(1, 87, 155, 1),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => SettingsPage()),
+          );
+        },
+        foregroundColor: Color.fromRGBO(187, 222, 251, 1),
+        backgroundColor: Color.fromRGBO(1, 87, 155, 1),
+        tooltip: "Settings",
+        child: Icon(Icons.settings),
       ),
-      body: ListView(
-        children: const [
+      appBar: AppBar(
+        title: const Text('Help Student'),
+        backgroundColor: Color.fromRGBO(187, 222, 251, 1),
+        centerTitle: true,
+        automaticallyImplyLeading: false,
+      ),
+      body: GridView.count(
+        crossAxisCount: 1,
+        childAspectRatio: (1 / .7),
+        children: <Widget>[
           GuidanceCard(),
           ITSpecialtyCard(),
           GPACard(),

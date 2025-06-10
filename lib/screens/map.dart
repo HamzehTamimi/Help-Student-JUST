@@ -1,207 +1,117 @@
+import 'dart:typed_data';
+import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:helpstudent/screens/marker_data_MAP.dart';
-import 'package:helpstudent/screens/marker_icons.dart';
-import 'package:helpstudent/utils/marker_data_MAP.dart';
-import 'package:helpstudent/utils/marker_icons.dart';
-import 'package:location/location.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-class MyMapPage extends StatefulWidget {
-  const MyMapPage({super.key});
-
-  @override
-  _MyMapPageState createState() => _MyMapPageState();
+void main() {
+  runApp(FirstApp());
 }
 
-class _MyMapPageState extends State<MyMapPage> {
-  GoogleMapController? mapController;
-  final LatLng _center = const LatLng(32.4938466, 35.9901261);
-  Set<Marker> _markers = {};
-  bool _isLoading = true;
-  MapType _mapType = MapType.normal;
-  LatLng? _currentLocation;
-  double _currentZoom = 14.0;
-  // ignore: unused_field
-  String? _selectedMarkerId;
+class FirstApp extends StatelessWidget {
+  const FirstApp({super.key});
 
   @override
-  void initState() {
-    super.initState();
-    _initMap();
-  }
-
-  Future<void> _initMap() async {
-    await MarkerIcons.loadAll();
-    await _loadMarkers();
-    await _getUserLocation();
-  }
-
-  Future<void> _getUserLocation() async {
-    Location location = Location();
-    if (!(await location.serviceEnabled()) &&
-        !(await location.requestService()))
-      return;
-    if (await location.hasPermission() == PermissionStatus.denied &&
-        await location.requestPermission() != PermissionStatus.granted)
-      return;
-    final loc = await location.getLocation();
-    setState(() {
-      _currentLocation = LatLng(loc.latitude!, loc.longitude!);
-    });
-  }
-
-  Future<void> _loadMarkers() async {
-    setState(() => _isLoading = true);
-    _markers = await _buildMarkers();
-    setState(() => _isLoading = false);
-  }
-
-  Future<Set<Marker>> _buildMarkers() async {
-    final Set<Marker> markers = {};
-    for (final data in markerData) {
-      final id = data['id'] as String;
-      final lat = (data['lat'] as num).toDouble();
-      final lng = (data['lng'] as num).toDouble();
-      final title = data['title'] as String;
-
-      final type = MarkerIcons.detectTypeFromId(id);
-      final icon = MarkerIcons.fromType(type);
-
-      markers.add(
-        Marker(
-          markerId: MarkerId(id),
-          position: LatLng(lat, lng),
-          infoWindow: InfoWindow(title: title),
-          icon: icon,
-          onTap: () => _onMarkerTapped(id),
-        ),
-      );
-    }
-    return markers;
-  }
-
-  void _onMarkerTapped(String markerId) {
-    setState(() => _selectedMarkerId = markerId);
-  }
-
-  void _goToJUST() {
-    mapController?.animateCamera(
-      CameraUpdate.newCameraPosition(
-        CameraPosition(target: _center, zoom: _currentZoom),
-      ),
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: "Helper Student",
+      home: Map(),
+      debugShowCheckedModeBanner: false,
     );
   }
+}
 
-  void _goToCurrentLocation() {
-    if (_currentLocation != null) {
-      mapController?.animateCamera(
-        CameraUpdate.newCameraPosition(
-          CameraPosition(target: _currentLocation!, zoom: _currentZoom),
-        ),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('لم يتم العثور على موقعك الحالي')),
-      );
-    }
-  }
-
-  void _zoomIn() {
-    setState(() {
-      _currentZoom++;
-      mapController?.animateCamera(CameraUpdate.zoomTo(_currentZoom));
-    });
-  }
-
-  void _zoomOut() {
-    setState(() {
-      _currentZoom--;
-      mapController?.animateCamera(CameraUpdate.zoomTo(_currentZoom));
-    });
-  }
+class Map extends StatelessWidget {
+  const Map({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+      body: Ccontainer(),
       appBar: AppBar(
-        title: const Text('خريطة جامعة العلوم'),
-        backgroundColor: const Color.fromRGBO(1, 87, 155, 1),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.layers),
-            onPressed: () {
-              setState(() {
-                _mapType =
-                    _mapType == MapType.normal
-                        ? MapType.satellite
-                        : MapType.normal;
-              });
-            },
+        backgroundColor: Color.fromRGBO(187, 222, 251, 1),
+        title: const Text(
+          "Map",
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+        ),
+        centerTitle: true,
+      ),
+    );
+  }
+}
+
+class Ccontainer extends StatelessWidget {
+  final TransformationController _transformationController =
+      TransformationController(Matrix4.identity()..scale(2.0));
+
+  // رابط الخريطة
+  final String mapUrl =
+      "https://www.google.com/maps/d/viewer?hl=ar&mid=1hFwEahSBrdebkXl0Uy0-lojiRiY30g4&ll=32.49759881514722%2C35.98446569229725&z=15";
+
+  Ccontainer({super.key});
+
+  // دالة لفتح الرابط
+  Future<void> _launchURL() async {
+    final Uri url = Uri.parse(mapUrl);
+
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url);
+    } else {
+      throw 'Could not launch $mapUrl';
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(top: 40, bottom: 40),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Text("Medical Buildings", style: TextStyle(fontSize: 20)),
+          Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(15.0),
+              child: InteractiveViewer(
+                transformationController: _transformationController,
+                boundaryMargin: EdgeInsets.zero,
+                constrained: true,
+                minScale: 1.0,
+                maxScale: 4.0,
+                child: Image.asset("images/map1.jpg", fit: BoxFit.fill),
+              ),
+            ),
+          ),
+          const SizedBox(height: 10), // مسافة بين الصور
+          Text("Engineering Buildings", style: TextStyle(fontSize: 20)),
+          Padding(
+            padding: const EdgeInsets.all(10.0),
+            // this is for zoom of the image
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(15.0),
+              child: InteractiveViewer(
+                transformationController: TransformationController(
+                  Matrix4.identity()..scale(2.0),
+                ),
+                boundaryMargin: EdgeInsets.zero,
+                constrained: true,
+                minScale: 1.0,
+                maxScale: 4.0,
+                child: Image.asset("images/map2.jpg", fit: BoxFit.fill),
+              ),
+            ),
+          ),
+          const SizedBox(height: 20), // مسافة بين الصور والزر
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Color.fromRGBO(1, 87, 155, 1),
+              foregroundColor: Colors.white,
+            ),
+            onPressed: _launchURL, // عند الضغط على الزر يتم فتح الرابط
+            child: const Text('Go To Map'),
           ),
         ],
-      ),
-      body: SafeArea(
-        child: Stack(
-          children: [
-            if (_isLoading)
-              const Center(child: CircularProgressIndicator())
-            else
-              GoogleMap(
-                onMapCreated: (c) => mapController = c,
-                initialCameraPosition: CameraPosition(
-                  target: _center,
-                  zoom: _currentZoom,
-                ),
-                markers: _markers,
-                mapType: _mapType,
-                myLocationEnabled: true,
-                myLocationButtonEnabled: false,
-                zoomControlsEnabled: false,
-              ),
-            Positioned(
-              bottom: 100,
-              right: 16,
-              child: Column(
-                children: [
-                  FloatingActionButton(
-                    heroTag: 'zoomIn',
-                    tooltip: 'تقريب',
-                    onPressed: _zoomIn,
-                    child: const Icon(Icons.zoom_in),
-                  ),
-                  const SizedBox(height: 12),
-                  FloatingActionButton(
-                    heroTag: 'zoomOut',
-                    tooltip: 'تبعيد',
-                    onPressed: _zoomOut,
-                    child: const Icon(Icons.zoom_out),
-                  ),
-                ],
-              ),
-            ),
-            Positioned(
-              bottom: 16,
-              left: 16,
-              child: Column(
-                children: [
-                  FloatingActionButton(
-                    heroTag: 'locate',
-                    tooltip: 'اذهب لموقعي',
-                    onPressed: _goToCurrentLocation,
-                    child: const Icon(Icons.my_location),
-                  ),
-                  const SizedBox(height: 12),
-                  FloatingActionButton(
-                    heroTag: 'just',
-                    tooltip: 'اذهب إلى الجامعة',
-                    onPressed: _goToJUST,
-                    child: const Icon(Icons.school),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }

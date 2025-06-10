@@ -22,8 +22,7 @@ dependencies:
   flutter_facebook_auth: ^7.1.1
   pdf: ^3.11.3
   open_file: ^3.5.10
-  location: ^5.0.3
-  google_maps_flutter: ^2.12.2
+  flutter_pdfview: ^1.4.0+1
 
 dev_dependencies:
   flutter_test:
@@ -33,22 +32,31 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
-    - assets/img/icons8-parking-48.png
-    - assets/img/icons8-university-48.png
-    - assets/img/icons8-hospital-50.png
-    - assets/img/icons8-mosque-48.png
-    - assets/img/icons8-tree-48.png
-    - assets/img/icons8-sea-waves-48.png
-    - assets/img/icons8-bank-building-48.png
-    - assets/img/icons8-insert-credit-card-40.png
-    - assets/img/icons8-photo-48.png
-    - assets/img/icons8-coffee-48.png
-    - assets/img/icons8-graduation-64.png
-    - assets/img/icons8-helicopter-48.png
-    - assets/img/icons8-stadium-40.png
-    - assets/img/icons8-university-60.png
-    - assets/img/icons8-library-50.png
-    - assets/img/icons8-bus-67.png
-    - assets/img/icons8-sleeping-in-bed-50.png
-    - assets/img/icons8-classroom-48.png
-    - assets/img/icons8-sleeping-in-bed-50.png
+   - images/map1.jpg
+   - images/map2.jpg
+
+  # An image asset can refer to one or more resolution-specific "variants", see
+  # https://flutter.dev/to/resolution-aware-images
+
+  # For details regarding adding assets from package dependencies, see
+  # https://flutter.dev/to/asset-from-package
+
+  # To add custom fonts to your application, add a fonts section here,
+  # in this "flutter" section. Each entry in this list should have a
+  # "family" key with the font family name, and a "fonts" key with a
+  # list giving the asset and other descriptors for the font. For
+  # example:
+  # fonts:
+  #   - family: Schyler
+  #     fonts:
+  #       - asset: fonts/Schyler-Regular.ttf
+  #       - asset: fonts/Schyler-Italic.ttf
+  #         style: italic
+  #   - family: Trajan Pro
+  #     fonts:
+  #       - asset: fonts/TrajanPro.ttf
+  #       - asset: fonts/TrajanPro_Bold.ttf
+  #         weight: 700
+  #
+  # For details regarding fonts from package dependencies,
+  # see https://flutter.dev/to/font-from-package

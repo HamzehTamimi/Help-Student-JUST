@@ -54,17 +54,13 @@ class _GPACalculatorScreenState extends State<GPACalculatorScreen> {
     'F': 0.5,
   };
 
-  get totalCredits => null;
-
-  get totalPoints => null;
-
   void _calculateGpa() {
     double totalPointsThisSemester = 0.0;
     double totalCreditsThisSemester = 0.0;
 
-    for (int i = 0; i < 5; i++) {
-      final grade = _selectedGrades[i];
-      final creditsText = _creditControllers[i].text;
+    for (var subject in _subjects) {
+      final grade = subject.selectedGrade;
+      final creditsText = subject.creditController.text;
       final credits = double.tryParse(creditsText) ?? 0.0;
 
       if (grade != null && credits > 0) {
@@ -84,10 +80,20 @@ class _GPACalculatorScreenState extends State<GPACalculatorScreen> {
     final totalCreditsCombined = totalCreditsThisSemester + totalCreditsSoFar;
 
     setState(() {
-      _output =
-          totalCredits > 0
-              ? 'GPA: ${(totalPoints / totalCredits).toStringAsFixed(2)}'
-              : 'Invalid Input';
+      if (totalCreditsCombined <= 0) {
+        _output = 'Invalid Input';
+      } else {
+        final gpaThisSemester =
+            totalCreditsThisSemester > 0
+                ? totalPointsThisSemester / totalCreditsThisSemester
+                : 0.0;
+
+        final cumulativeGPA = totalPointsCombined / totalCreditsCombined;
+
+        _output =
+            'This Semester GPA: ${gpaThisSemester.toStringAsFixed(2)}\n'
+            'New Cumulative GPA: ${cumulativeGPA.toStringAsFixed(2)}';
+      }
     });
   }
 
@@ -138,12 +144,32 @@ class _GPACalculatorScreenState extends State<GPACalculatorScreen> {
                 ),
               ],
             ),
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'Subjects',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                Row(
+                  children: [
+                    IconButton(
+                      onPressed: _addSubject,
+                      icon: const Icon(Icons.add_circle, color: Colors.green),
+                      tooltip: 'Add Subject',
+                    ),
+                    Text('${_subjects.length} subjects'),
+                  ],
+                ),
+              ],
+            ),
             const SizedBox(height: 10),
             const HeaderRow(),
             const SizedBox(height: 10),
             Expanded(
               child: ListView.builder(
-                itemCount: 5,
+                itemCount: _subjects.length,
                 itemBuilder: (context, index) {
                   return Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -218,22 +244,25 @@ class HeaderRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: const [
         Expanded(
+          flex: 2,
           child: Text(
             'Grade',
             textAlign: TextAlign.center,
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
         ),
+        SizedBox(width: 8),
         Expanded(
+          flex: 2,
           child: Text(
             'Credits / Hours',
             textAlign: TextAlign.center,
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
         ),
+        SizedBox(width: 48), // Space for remove button
       ],
     );
   }
@@ -247,7 +276,7 @@ class OutputField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+      padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 15),
       decoration: BoxDecoration(
         border: Border.all(color: Colors.grey),
         borderRadius: BorderRadius.circular(10),
