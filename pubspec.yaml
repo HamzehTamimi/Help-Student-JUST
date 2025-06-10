@@ -37,6 +37,7 @@ flutter:
   assets:
    - images/map1.jpg
    - images/map2.jpg
+   - images/uni_logo.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
